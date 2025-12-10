@@ -2,8 +2,8 @@
 
 int main()
 {
-    // Crear una ventana
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Sprite Animado");
+    // Crear una ventana más grande para ver a Snoopy completo
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy Animado");
 
     // Cargar la imagen desde un archivo
     sf::Texture texture;
@@ -13,19 +13,40 @@ int main()
         return -1;
     }
 
-    // Crear un sprite y asignarle la textura
-    sf::Sprite sprite(texture);
-    sprite.setPosition(270, 80);
+    // Crear sprites para cada parte de Snoopy
+    sf::Sprite spriteSuperior(texture);
+    sf::Sprite spriteInferior(texture);
     
-    // Escalar la imagen para que se vea más pequeña y quepa completa
-    sprite.setScale(0.28f, 0.28f);
+    // Dimensiones de cada frame
+    int frameWidth = 264;  // Ancho de cada frame (1056/4 columnas)
+    int frameHeight = 496; // Alto de cada frame (992/2 filas)
+    
+    // Configurar el rectángulo de textura para cada sprite (usar la primera columna)
+    spriteSuperior.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight)); // Parte superior
+    spriteInferior.setTextureRect(sf::IntRect(0, frameHeight, frameWidth, frameHeight)); // Parte inferior
+    
+    // Calcular escala para que quepa en la ventana
+    float totalHeight = frameHeight * 2; // Altura total de ambas partes
+    float scaleX = 800.0f / frameWidth;
+    float scaleY = 600.0f / totalHeight;
+    float scale = (scaleX < scaleY) ? scaleX * 0.9f : scaleY * 0.9f; // 90% del espacio disponible
+    
+    spriteSuperior.setScale(scale, scale);
+    spriteInferior.setScale(scale, scale);
+    
+    // Posicionar los sprites uno debajo del otro y centrados
+    float scaledWidth = frameWidth * scale;
+    float scaledHeight = frameHeight * scale;
+    float startX = (800 - scaledWidth) / 2;
+    float startY = (600 - (scaledHeight * 2)) / 2;
+    
+    spriteSuperior.setPosition(startX, startY);
+    spriteInferior.setPosition(startX, startY + scaledHeight);
 
     sf::Clock clock;
     float frameTime = 0.1f; // Tiempo entre cada frame en segundos
     int currentFrame = 0;
-    int numFrames = 4; // Número total de frames en la animación
-    int frameWidth = 264;  // Cada frame tiene 264 píxeles de ancho (1056/4)
-    int frameHeight = 496; // Cada frame tiene 496 píxeles de alto (992/2)
+    int numFrames = 4; // Número de frames por fila
 
     while (window.isOpen())
     {
@@ -43,12 +64,15 @@ int main()
         if (clock.getElapsedTime().asSeconds() >= frameTime)
         {
             currentFrame = (currentFrame + 1) % numFrames;
-            sprite.setTextureRect(sf::IntRect(currentFrame * frameWidth, 0, frameWidth, frameHeight));
+            // Actualizar ambos sprites con el mismo frame
+            spriteSuperior.setTextureRect(sf::IntRect(currentFrame * frameWidth, 0, frameWidth, frameHeight));
+            spriteInferior.setTextureRect(sf::IntRect(currentFrame * frameWidth, frameHeight, frameWidth, frameHeight));
             clock.restart();
         }
 
         window.clear();
-        window.draw(sprite);
+        window.draw(spriteSuperior);
+        window.draw(spriteInferior);
         window.display();
     }
 
