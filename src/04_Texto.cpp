@@ -7,15 +7,7 @@ int main()
 
     // Cargar la fuente de texto TTF
     sf::Font font;
-    if (!font.loadFromFile("./assets/fonts/Minecraft.ttf"))
-    {
-        // Manejar el error si no se puede cargar la fuente
-        return -1;
-    }
-
-    // Cargar una fuente de texto
-    sf::Font font2;
-    if (!font2.loadFromFile("./assets/fonts/Ring.ttf"))
+    if (!font.loadFromFile("./assets/fonts/Zombie_Hunger[1].ttf"))
     {
         // Manejar el error si no se puede cargar la fuente
         return -1;
@@ -24,16 +16,10 @@ int main()
     // Crear un objeto de texto
     sf::Text text;
     text.setFont(font);
-    text.setString("Ejemplo texto Minecraft!");
+    text.setString("Zombie Hunger!");
     text.setCharacterSize(29);
     text.setFillColor(sf::Color::White);
 
-    // Crear un objeto de texto LOTR
-    sf::Text text2;
-    text2.setFont(font2);
-    text2.setString("Ejemplo texto LOTR");
-    text2.setCharacterSize(40);
-    text2.setPosition(100, 100);
 
     while (window.isOpen())
     {
@@ -48,7 +34,6 @@ int main()
 
         window.clear();
         window.draw(text);
-        window.draw(text2);
         window.display();
     }
 
