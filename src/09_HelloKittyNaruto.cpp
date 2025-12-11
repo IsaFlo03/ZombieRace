@@ -26,6 +26,9 @@ int main()
     int numFrames = 4; // Número total de frames en la animación
     int frameWidth = 216;  // Cada frame tiene 216 píxeles de ancho (864/4)
     int frameHeight = 592; // Cada frame tiene 592 píxeles de alto (1184/2)
+    float speed = 100.0f; // Velocidad de movimiento en píxeles por segundo
+
+    sf::Clock movementClock; // Reloj para el movimiento
 
     while (window.isOpen())
     {
@@ -37,6 +40,16 @@ int main()
             {
                 window.close();
             }
+        }
+
+        // Mover el sprite hacia la derecha
+        float deltaTime = movementClock.restart().asSeconds();
+        sprite.move(speed * deltaTime, 0);
+
+        // Si el sprite sale por la derecha, reiniciar a la izquierda
+        if (sprite.getPosition().x > 800)
+        {
+            sprite.setPosition(-frameWidth * 0.3f, sprite.getPosition().y);
         }
 
         // Actualizar el frame de la animación

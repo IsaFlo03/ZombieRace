@@ -1,31 +1,36 @@
 #include <SFML/Graphics.hpp>
 
-class Personaje {
-public:
-    Personaje(sf::Vector2f position, sf::Color color) {
-        shape.setSize(sf::Vector2f(50, 50));
-        shape.setPosition(position);
-        shape.setFillColor(color);
-    }
-
-    void move(float offsetX, float offsetY) {
-        shape.move(offsetX, offsetY);
-    }
-
-    void draw(sf::RenderWindow& window) {
-        window.draw(shape);
-    }
-
-private:
-    sf::RectangleShape shape;
-};
-
-double velocidad = 0.1;
+double velocidad = 0.3;
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "DinoChrome");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Hello Kitty Teclado");
 
-    Personaje character(sf::Vector2f(400, 300), sf::Color::Red);
+    // Cargar la imagen de Hello Kitty
+    sf::Texture texture;
+    if (!texture.loadFromFile("assets/images/hellokitty.png"))
+    {
+        return -1;
+    }
+
+    // Crear un sprite y asignarle la textura
+    sf::Sprite sprite(texture);
+    sprite.setPosition(300, 250);
+    sprite.setScale(0.3f, 0.3f);
+
+    sf::Clock clock;
+    float frameTime = 0.1f;
+    int currentFrame = 0;
+    int numFrames = 4;
+    int frameWidth = 216;
+    int frameHeight = 592;
+
+    // Variables para el salto
+    float velocidadY = 0;
+    float gravedad = 0.01f;
+    float fuerzaSalto = -1.5f;
+    float suelo = 250;
+    bool enElSuelo = true;
+    bool spacePressedBefore = false;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -35,21 +40,49 @@ int main() {
             }
         }
 
+        // Movimiento horizontal con teclado (funciona también durante el salto)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            character.move(velocidad * -1, 0);
+            sprite.move(-velocidad, 0);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            character.move(velocidad, 0);
+            sprite.move(velocidad, 0);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            character.move(0, velocidad * -1);
+            sprite.move(0, -velocidad);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            character.move(0, velocidad);
+            sprite.move(0, velocidad);
+        }
+
+        // Salto con espacio (solo una vez por toque)
+        bool spacePressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+        if (spacePressed && !spacePressedBefore && enElSuelo) {
+            velocidadY = fuerzaSalto;
+            enElSuelo = false;
+        }
+        spacePressedBefore = spacePressed;
+
+        // Aplicar gravedad y movimiento vertical
+        velocidadY += gravedad;
+        sprite.move(0, velocidadY);
+
+        // Verificar si está en el suelo
+        if (sprite.getPosition().y >= suelo) {
+            sprite.setPosition(sprite.getPosition().x, suelo);
+            velocidadY = 0;
+            enElSuelo = true;
+        }
+
+        // Actualizar animación
+        if (clock.getElapsedTime().asSeconds() >= frameTime)
+        {
+            currentFrame = (currentFrame + 1) % numFrames;
+            sprite.setTextureRect(sf::IntRect(currentFrame * frameWidth, 0, frameWidth, frameHeight));
+            clock.restart();
         }
 
         window.clear();
-        character.draw(window);
+        window.draw(sprite);
         window.display();
     }
 
