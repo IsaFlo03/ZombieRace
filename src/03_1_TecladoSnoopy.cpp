@@ -50,6 +50,13 @@ int main() {
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
+    // Variables para el boost de velocidad
+    float velocidadActual = velocidad;
+    float velocidadBoost = velocidad * 3.0f;
+    bool boostActivo = false;
+    sf::Clock boostClock;
+    bool upPressedBefore = false;
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -58,18 +65,29 @@ int main() {
             }
         }
 
+        // Activar boost con flecha arriba (solo una vez por toque)
+        bool upPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+        if (upPressed && !upPressedBefore && !boostActivo) {
+            boostActivo = true;
+            velocidadActual = velocidadBoost;
+            boostClock.restart();
+        }
+        upPressedBefore = upPressed;
+
+        // Desactivar boost después de 2 segundos
+        if (boostActivo && boostClock.getElapsedTime().asSeconds() >= 2.0f) {
+            boostActivo = false;
+            velocidadActual = velocidad;
+        }
+
         // Movimiento horizontal con teclado (funciona también durante el salto)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            spriteSuperior.move(-velocidad, 0);
-            spriteInferior.move(-velocidad, 0);
+            spriteSuperior.move(-velocidadActual, 0);
+            spriteInferior.move(-velocidadActual, 0);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            spriteSuperior.move(velocidad, 0);
-            spriteInferior.move(velocidad, 0);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            spriteSuperior.move(0, -velocidad);
-            spriteInferior.move(0, -velocidad);
+            spriteSuperior.move(velocidadActual, 0);
+            spriteInferior.move(velocidadActual, 0);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
             spriteSuperior.move(0, velocidad);
