@@ -26,6 +26,21 @@ int main()
         return -1;
     }
 
+    // Cargar imágenes de personajes
+    sf::Texture helloKittyTexture;
+    if (!helloKittyTexture.loadFromFile("./assets/images/hellokitty.png"))
+    {
+        return -1;
+    }
+    sf::Sprite helloKittySprite(helloKittyTexture);
+    
+    sf::Texture snoopyTexture;
+    if (!snoopyTexture.loadFromFile("./assets/images/snoopy.png"))
+    {
+        return -1;
+    }
+    sf::Sprite snoopySprite(snoopyTexture);
+
     // Título del juego
     sf::Text titulo;
     titulo.setFont(font);
@@ -82,6 +97,61 @@ int main()
 
     bool juegoIniciado = false;
     bool zombiepediaAbierta = false;
+    bool seleccionPersonaje = false;
+    std::string personajeSeleccionado = "";
+
+    // Textos para selección de personaje
+    sf::Text tituloSeleccion;
+    tituloSeleccion.setFont(font);
+    tituloSeleccion.setString("Elige tu personaje");
+    tituloSeleccion.setCharacterSize(60);
+    tituloSeleccion.setFillColor(sf::Color(0x65, 0x09, 0x09));
+    sf::FloatRect seleccionRect = tituloSeleccion.getLocalBounds();
+    tituloSeleccion.setOrigin(seleccionRect.left + seleccionRect.width/2.0f, seleccionRect.top + seleccionRect.height/2.0f);
+    tituloSeleccion.setPosition(400, 60);
+
+    // Configurar sprite de Hello Kitty (mitad izquierda, centrado)
+    float hkScale = 1.1f;
+    helloKittySprite.setTextureRect(sf::IntRect(0, 0, 216, 592)); // Primer frame
+    helloKittySprite.setScale(hkScale, hkScale);
+    float hkScaledWidth = 216 * hkScale;
+    float hkScaledHeight = 592 * hkScale;
+    helloKittySprite.setPosition((200 - hkScaledWidth/2), 350 - hkScaledHeight/2);
+
+    // Cargar segunda parte de Snoopy
+    sf::Sprite snoopySprite2(snoopyTexture);
+    
+    // Configurar sprite de Snoopy completo (mitad derecha, centrado, misma altura)
+    float snoopyScale = 0.8f;
+    float snoopyScaledWidth = 264 * snoopyScale;
+    float snoopyTotalHeight = 992 * snoopyScale; // altura total de ambas partes
+    float snoopyPosX = 400 + (200 - snoopyScaledWidth/2);
+    
+    snoopySprite.setTextureRect(sf::IntRect(0, 0, 264, 496)); // Primer frame parte superior
+    snoopySprite.setScale(snoopyScale, snoopyScale);
+    snoopySprite.setPosition(snoopyPosX, 300 - snoopyTotalHeight/2);
+    
+    snoopySprite2.setTextureRect(sf::IntRect(0, 496, 264, 496)); // Parte inferior
+    snoopySprite2.setScale(snoopyScale, snoopyScale);
+    snoopySprite2.setPosition(snoopyPosX, 300 - snoopyTotalHeight/2 + 496 * snoopyScale);
+
+    sf::Text opcionHelloKitty;
+    opcionHelloKitty.setFont(font);
+    opcionHelloKitty.setString("Hello Kitty");
+    opcionHelloKitty.setCharacterSize(55);
+    opcionHelloKitty.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
+    sf::FloatRect hkRect = opcionHelloKitty.getLocalBounds();
+    opcionHelloKitty.setOrigin(hkRect.left + hkRect.width/2.0f, hkRect.top + hkRect.height/2.0f);
+    opcionHelloKitty.setPosition(400, 320);
+
+    sf::Text opcionSnoopy;
+    opcionSnoopy.setFont(font);
+    opcionSnoopy.setString("Snoopy");
+    opcionSnoopy.setCharacterSize(55);
+    opcionSnoopy.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
+    sf::FloatRect snoopyRect = opcionSnoopy.getLocalBounds();
+    opcionSnoopy.setOrigin(snoopyRect.left + snoopyRect.width/2.0f, snoopyRect.top + snoopyRect.height/2.0f);
+    opcionSnoopy.setPosition(400, 420);
 
     while (window.isOpen())
     {
@@ -99,16 +169,42 @@ int main()
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    sf::FloatRect playBounds = botonPlay.getGlobalBounds();
-                    sf::FloatRect zombiepediaBounds = botonZombiepedia.getGlobalBounds();
                     
-                    if (playBounds.contains(mousePos.x, mousePos.y))
+                    if (!seleccionPersonaje && !zombiepediaAbierta)
                     {
-                        juegoIniciado = true;
+                        sf::FloatRect playBounds = botonPlay.getGlobalBounds();
+                        sf::FloatRect zombiepediaBounds = botonZombiepedia.getGlobalBounds();
+                        
+                        if (playBounds.contains(mousePos.x, mousePos.y))
+                        {
+                            seleccionPersonaje = true;
+                        }
+                        if (zombiepediaBounds.contains(mousePos.x, mousePos.y))
+                        {
+                            zombiepediaAbierta = true;
+                        }
                     }
-                    if (zombiepediaBounds.contains(mousePos.x, mousePos.y))
+                    else if (seleccionPersonaje)
                     {
-                        zombiepediaAbierta = true;
+                        sf::FloatRect hkBounds = helloKittySprite.getGlobalBounds();
+                        // Área combinada de Snoopy (ambas partes)
+                        sf::FloatRect snoopyBounds(snoopySprite.getGlobalBounds().left,
+                                                   snoopySprite.getGlobalBounds().top,
+                                                   snoopySprite.getGlobalBounds().width,
+                                                   snoopySprite.getGlobalBounds().height + snoopySprite2.getGlobalBounds().height);
+                        
+                        if (hkBounds.contains(mousePos.x, mousePos.y))
+                        {
+                            personajeSeleccionado = "hellokitty";
+                            juegoIniciado = true;
+                            seleccionPersonaje = false;
+                        }
+                        if (snoopyBounds.contains(mousePos.x, mousePos.y))
+                        {
+                            personajeSeleccionado = "snoopy";
+                            juegoIniciado = true;
+                            seleccionPersonaje = false;
+                        }
                     }
                 }
             }
@@ -117,26 +213,58 @@ int main()
         // Efecto hover en el botón
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
         
-        // Para detectar hover en PLAY, usar las dimensiones del texto
-        sf::FloatRect playBounds = botonPlay.getGlobalBounds();
-        if (playBounds.contains(mousePos.x, mousePos.y))
+        if (!seleccionPersonaje && !zombiepediaAbierta)
         {
-            botonPlay.setFillColor(sf::Color::Yellow);
-        }
-        else
-        {
-            botonPlay.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
-        }
+            // Para detectar hover en PLAY, usar las dimensiones del texto
+            sf::FloatRect playBounds = botonPlay.getGlobalBounds();
+            if (playBounds.contains(mousePos.x, mousePos.y))
+            {
+                botonPlay.setFillColor(sf::Color::Yellow);
+            }
+            else
+            {
+                botonPlay.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
+            }
 
-        // Efecto hover en el botón Zombiepedia
-        sf::FloatRect zombiepediaBounds = botonZombiepedia.getGlobalBounds();
-        if (zombiepediaBounds.contains(mousePos.x, mousePos.y))
-        {
-            botonZombiepedia.setFillColor(sf::Color(0xCD, 0x85, 0x3F));
+            // Efecto hover en el botón Zombiepedia
+            sf::FloatRect zombiepediaBounds = botonZombiepedia.getGlobalBounds();
+            if (zombiepediaBounds.contains(mousePos.x, mousePos.y))
+            {
+                botonZombiepedia.setFillColor(sf::Color(0xCD, 0x85, 0x3F));
+            }
+            else
+            {
+                botonZombiepedia.setFillColor(sf::Color(0x8B, 0x45, 0x13));
+            }
         }
-        else
+        else if (seleccionPersonaje)
         {
-            botonZombiepedia.setFillColor(sf::Color(0x8B, 0x45, 0x13));
+            // Efecto hover en Hello Kitty
+            sf::FloatRect hkBounds = helloKittySprite.getGlobalBounds();
+            if (hkBounds.contains(mousePos.x, mousePos.y))
+            {
+                helloKittySprite.setColor(sf::Color(255, 255, 200)); // Tinte amarillento
+            }
+            else
+            {
+                helloKittySprite.setColor(sf::Color::White);
+            }
+
+            // Efecto hover en Snoopy (ambas partes)
+            sf::FloatRect snoopyBounds(snoopySprite.getGlobalBounds().left,
+                                       snoopySprite.getGlobalBounds().top,
+                                       snoopySprite.getGlobalBounds().width,
+                                       snoopySprite.getGlobalBounds().height + snoopySprite2.getGlobalBounds().height);
+            if (snoopyBounds.contains(mousePos.x, mousePos.y))
+            {
+                snoopySprite.setColor(sf::Color(255, 255, 200)); // Tinte amarillento
+                snoopySprite2.setColor(sf::Color(255, 255, 200));
+            }
+            else
+            {
+                snoopySprite.setColor(sf::Color::White);
+                snoopySprite2.setColor(sf::Color::White);
+            }
         }
 
         // Si el juego ha iniciado, mostrar pantalla vacía para el juego
@@ -147,12 +275,22 @@ int main()
             // Aquí irá el contenido del juego
             sf::Text mensajeJuego;
             mensajeJuego.setFont(font);
-            mensajeJuego.setString("El juego comenzara aqui...");
+            mensajeJuego.setString("Jugando con: " + personajeSeleccionado);
             mensajeJuego.setCharacterSize(40);
             mensajeJuego.setFillColor(sf::Color::White);
             mensajeJuego.setPosition(150, 270);
             
             window.draw(mensajeJuego);
+        }
+        else if (seleccionPersonaje)
+        {
+            // Mostrar pantalla de selección de personaje
+            window.clear(sf::Color::Black);
+            window.draw(fondoSprite);
+            window.draw(tituloSeleccion);
+            window.draw(helloKittySprite);
+            window.draw(snoopySprite);
+            window.draw(snoopySprite2);
         }
         else if (zombiepediaAbierta)
         {
