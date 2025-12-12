@@ -44,6 +44,13 @@ int main() {
     {
         return -1;
     }
+    
+    // Cargar la imagen de Hello Kitty perdedora
+    sf::Texture hellokittyPerdedoraTexture;
+    if (!hellokittyPerdedoraTexture.loadFromFile("assets/images/hellokitty perdedora.png"))
+    {
+        return -1;
+    }
 
     // Crear múltiples sprites del fondo para efecto parallax continuo
     const int NUM_FONDOS = 16; // 8 de cada tipo
@@ -95,7 +102,7 @@ int main() {
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
-    sprite.setScale(0.2f, 0.2f); // Más pequeña
+    sprite.setScale(0.22f, 0.22f); // Más grande
 
     sf::Clock clock;
     float frameTime = 0.1f;
@@ -120,11 +127,11 @@ int main() {
     // Crear sprites de zombies con posiciones fijas
     sf::Sprite zombieSprites[8];
     float zombiePosicionesIniciales[8];
-    float alturaUniformeZombies = 100.0f;
+    float alturaUniformeZombies = 120.0f;
     
     // Posiciones fijas y dispersas para cada zombie
     float posicionesFijas[8] = {
-        850.0f, 1100.0f, 1200.0f, 1800.0f,
+        850.0f, 1100.0f, 1300.0f, 1800.0f,
         2500.0f, 2650.0f, 3400.0f, 4100.0f
     };
     
@@ -160,6 +167,8 @@ int main() {
     bool juegoPerdido = false;
     sf::Clock relojVictoria; // Reloj para esperar 2 segundos antes de mostrar interior
     bool mostrarInterior = false;
+    float posicionPerdidaX = 0.0f;
+    float posicionPerdidaY = 0.0f;
     
     // Cargar la fuente para el mensaje de victoria
     sf::Font zombieFont;
@@ -183,6 +192,19 @@ int main() {
     textoVictoria.setCharacterSize(50);
     textoVictoria.setFillColor(sf::Color::Red);
     textoVictoria.setPosition(150, 250);
+    
+    // Crear sprite de Hello Kitty perdedora
+    sf::Sprite hellokittyPerdedoraSprite(hellokittyPerdedoraTexture);
+    // Escalar más pequeña que Hello Kitty
+    hellokittyPerdedoraSprite.setScale(0.09f, 0.09f);
+    
+    // Crear texto de derrota
+    sf::Text textoDerrota;
+    textoDerrota.setFont(zombieFont);
+    textoDerrota.setString("te atraparon\nPresiona R para reiniciar");
+    textoDerrota.setCharacterSize(40);
+    textoDerrota.setFillColor(sf::Color::Red);
+    textoDerrota.setPosition(150, 220);
     
     // Ajustar posición inicial de Hello Kitty para estar exactamente sobre el suelo
     float alturaSprite = frameHeight * 0.3f; // 592 * 0.3 = 177.6
@@ -266,6 +288,9 @@ int main() {
                 
                 if (helloKittyBounds.intersects(zombieBounds)) {
                     juegoPerdido = true;
+                    posicionPerdidaX = sprite.getPosition().x;
+                    posicionPerdidaY = sprite.getPosition().y + 25.0f;
+                    hellokittyPerdedoraSprite.setPosition(posicionPerdidaX, posicionPerdidaY);
                     break;
                 }
             }
@@ -287,6 +312,28 @@ int main() {
         // Verificar si han pasado 0.5 segundos desde que ganó
         if (juegoGanado && relojVictoria.getElapsedTime().asSeconds() >= 0.5f) {
             mostrarInterior = true;
+        }
+        
+        // Reiniciar nivel si se presiona R cuando está perdido
+        if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+            // Resetear variables del juego
+            juegoPerdido = false;
+            juegoGanado = false;
+            mostrarInterior = false;
+            
+            // Resetear posición de Hello Kitty
+            float alturaSprite = frameHeight * 0.3f;
+            sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
+            velocidadY = 0;
+            enElSuelo = true;
+            
+            // Resetear fondo y distancia
+            fondoOffset = 0.0f;
+            distanciaRecorrida = 0.0f;
+            
+            // Resetear animación
+            currentFrame = 0;
+            sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
         }
 
         // Salto con espacio
@@ -357,6 +404,12 @@ int main() {
         // Dibujar Hello Kitty solo si no ha ganado ni perdido
         if (!juegoGanado && !juegoPerdido) {
             window.draw(sprite);
+        }
+        
+        // Dibujar Hello Kitty perdedora si perdió
+        if (juegoPerdido) {
+            window.draw(hellokittyPerdedoraSprite);
+            window.draw(textoDerrota);
         }
         
         // Mostrar mensaje de victoria si ganó y han pasado 2 segundos
