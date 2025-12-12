@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 
-double velocidad = 0.3;
+double velocidad = 0.1;
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Hello Kitty Teclado");
@@ -69,8 +69,11 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             sprite.move(velocidadActual, 0);
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+            sprite.move(0, -velocidadActual);
+        }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            sprite.move(0, velocidad);
+            sprite.move(0, velocidadActual);
         }
 
         // Salto con espacio (solo una vez por toque)

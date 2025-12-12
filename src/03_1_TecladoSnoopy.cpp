@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 
-double velocidad = 0.3;
+double velocidad = 0.1;
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy Teclado");
