@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
 double velocidad = 0.03;
 
@@ -87,13 +88,13 @@ int main() {
     }
 
     // Cargar las texturas de los zombies
-    sf::Texture zombieTextures[8];
-    std::string zombieNames[8] = {
+    sf::Texture zombieTextures[7];
+    std::string zombieNames[7] = {
         "Zombirron", "Zombiano", "Zombilia", "Zombando",
-        "Zombiguada", "Zombiscocho", "Zombiela", "Zombiboy"
+        "Zombiguada", "Zombiscocho", "Zombiela"
     };
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
         if (!zombieTextures[i].loadFromFile("assets/images/" + zombieNames[i] + ".png")) {
             return -1;
         }
@@ -102,43 +103,42 @@ int main() {
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
-    sprite.setScale(0.2f, 0.2f); // Más pequeña
+    sprite.setScale(0.3f, 0.3f);
 
     sf::Clock clock;
     float frameTime = 0.1f;
     int currentFrame = 0;
     int numFrames = 4;
-    int frameWidth = 320;  // Dimensión correcta (1280/4)
-    int frameHeight = 612; // Dimensión correcta de hellokitty.png
+    int frameWidth = 216;
+    int frameHeight = 592;
 
     // Variables para el salto
     float velocidadY = 0;
     float gravedad = 0.01f;
     float fuerzaSalto = -1.5f;
-    float alturaSuelo = 635; // Altura donde está el suelo (bajada 5px)
+    float alturaSuelo = 630; // Altura donde está el suelo
     
     // Crear sprites de zombies con posiciones aleatorias
-    sf::Sprite zombieSprites[8];
-    float zombiePosicionesIniciales[8]; // Guardar posiciones iniciales absolutas
+    sf::Sprite zombieSprites[7];
+    float zombiePosicionesIniciales[7]; // Guardar posiciones iniciales absolutas
     float alturaUniformeZombies = 100.0f; // Altura uniforme para todos los zombies
     
     // Posiciones fijas y dispersas para cada zombie
-    float posicionesFijas[8] = {
-        800.0f, 1000.0f, 1500.0f, 1900.0f,
-        2200.0f, 2700.0f, 3300.0f, 4000.0f
+    float posicionesFijas[7] = {
+        600.0f, 1200.0f, 1800.0f, 2400.0f,
+        3000.0f, 3600.0f, 4000.0f
     };
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
         zombieSprites[i].setTexture(zombieTextures[i]);
         
         // Calcular escala para que todos tengan la misma altura
-        float alturaZombie = alturaUniformeZombies; // Todos los zombies a la misma altura
-        float escalaUniforme = alturaZombie / zombieTextures[i].getSize().y;
+        float escalaUniforme = alturaUniformeZombies / zombieTextures[i].getSize().y;
         zombieSprites[i].setScale(escalaUniforme, escalaUniforme);
         
         // Usar posiciones fijas
         zombiePosicionesIniciales[i] = posicionesFijas[i];
-        float posicionY = alturaSuelo - alturaZombie - 50.0f;
+        float posicionY = alturaSuelo - alturaUniformeZombies - 50.0f;
         
         zombieSprites[i].setPosition(zombiePosicionesIniciales[i], posicionY);
     }
@@ -209,7 +209,7 @@ int main() {
     
     // Crear sprite de derrota
     sf::Sprite derrotaSprite(derrotaTexture);
-    derrotaSprite.setScale(0.08f, 0.08f); // Un poquito más pequeña
+    derrotaSprite.setScale(0.5f, 0.5f);
     
     // Crear texto de derrota
     sf::Text textoDerrota;
@@ -325,10 +325,9 @@ int main() {
         cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 307.2f);
         
         // Actualizar posiciones de los zombies con el movimiento del fondo
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 7; i++) {
             float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida;
-            float alturaZombie = alturaUniformeZombies; // Todos los zombies a la misma altura
-            float posZombieY = alturaSuelo - alturaZombie - 50.0f;
+            float posZombieY = alturaSuelo - alturaUniformeZombies - 50.0f;
             zombieSprites[i].setPosition(posZombieX, posZombieY);
         }
         
@@ -358,7 +357,7 @@ int main() {
                 originalBounds.height * (1.0f - 2.0f * reduccion)
             );
             
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 7; i++) {
                 // También reducir la zona de colisión de los zombies
                 sf::FloatRect originalZombieBounds = zombieSprites[i].getGlobalBounds();
                 sf::FloatRect zombieBounds(
@@ -371,8 +370,8 @@ int main() {
                 if (helloKittyBounds.intersects(zombieBounds)) {
                     juegoPerdido = true;
                     mostrarDerrota = true; // Mostrar inmediatamente
-                    // Posicionar en la misma ubicación donde está Hello Kitty
-                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y);
+                    // Guardar la posición de Hello Kitty al momento de la colisión y bajarla 25 píxeles
+                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 25.0f);
                     break;
                 }
             }
@@ -461,7 +460,7 @@ int main() {
         window.draw(cabanita);
         
         // Dibujar zombies
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 7; i++) {
             // Solo dibujar zombies que estén dentro de la pantalla visible
             float posX = zombieSprites[i].getPosition().x;
             if (posX > -200 && posX < 1000) {
