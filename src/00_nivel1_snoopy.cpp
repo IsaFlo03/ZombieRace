@@ -1,9 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
-double velocidad = 0.03;
+double velocidad = 0.05;
 
 int main() {
+    // Inicializar semilla aleatoria con valor fijo para posiciones consistentes
+    std::srand(42);
+    
     sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy Adventure");
 
     // Cargar los fondos
@@ -36,6 +41,13 @@ int main() {
     // Cargar la imagen de interior para la victoria
     sf::Texture interiorTexture;
     if (!interiorTexture.loadFromFile("assets/images/interior snoopy.png"))
+    {
+        return -1;
+    }
+    
+    // Cargar la imagen de Snoopy perdedor
+    sf::Texture snoopyPerdedorTexture;
+    if (!snoopyPerdedorTexture.loadFromFile("assets/images/snoopy perdedor.png"))
     {
         return -1;
     }
@@ -74,30 +86,69 @@ int main() {
         return -1;
     }
 
+    // Cargar las texturas de los zombies
+    sf::Texture zombieTextures[8];
+    std::string zombieNames[8] = {
+        "Zombirron", "Zombiano", "Zombilia", "Zombando",
+        "Zombiguada", "Zombiscocho", "Zombiela", "Zombiboy"
+    };
+    
+    for (int i = 0; i < 8; i++) {
+        if (!zombieTextures[i].loadFromFile("assets/images/" + zombieNames[i] + ".png")) {
+            return -1;
+        }
+    }
+
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
-    sprite.setScale(0.2f, 0.2f);
+    sprite.setScale(0.2f, 0.2f); // Más pequeña
 
     sf::Clock clock;
     float frameTime = 0.1f;
     int currentFrame = 0;
     int numFrames = 4;
-    int frameWidth = 264;
-    int frameHeight = 992; // Altura completa de Snoopy (ambas filas)
+    int frameWidth = 264;  // Dimensión correcta de snoopy.png (1056/4)
+    int frameHeight = 992; // Dimensión completa de snoopy.png (cuerpo completo)
 
     // Variables para el salto
     float velocidadY = 0;
     float gravedad = 0.01f;
     float fuerzaSalto = -1.5f;
-    float alturaSuelo = 560; // Altura donde está el suelo
+    float alturaSuelo = 575; // Altura donde está el suelo (subida 4px más)
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
     // Variable para el desplazamiento del fondo
     float fondoOffset = 0.0f;
-    float velocidadFondo = 0.25f; // Velocidad del fondo más lenta
+    float velocidadFondo = 0.5f; // Velocidad del fondo mantiene igual
     float distanciaRecorrida = 0.0f; // Distancia total recorrida sin ciclar
+    
+    // Crear sprites de zombies con posiciones fijas
+    sf::Sprite zombieSprites[8];
+    float zombiePosicionesIniciales[8];
+    float alturaUniformeZombies = 100.0f;
+    
+    // Posiciones fijas y dispersas para cada zombie
+    float posicionesFijas[8] = {
+        850.0f, 1100.0f, 1200.0f, 1800.0f,
+        2500.0f, 2650.0f, 3400.0f, 4100.0f
+    };
+    
+    for (int i = 0; i < 8; i++) {
+        zombieSprites[i].setTexture(zombieTextures[i]);
+        
+        // Calcular escala para que todos tengan la misma altura
+        float alturaZombie = alturaUniformeZombies;
+        float escalaUniforme = alturaZombie / zombieTextures[i].getSize().y;
+        zombieSprites[i].setScale(escalaUniforme, escalaUniforme);
+        
+        // Usar posiciones fijas
+        zombiePosicionesIniciales[i] = posicionesFijas[i];
+        float posicionY = alturaSuelo - alturaZombie - 50.0f;
+        
+        zombieSprites[i].setPosition(zombiePosicionesIniciales[i], posicionY);
+    }
     
     // Crear plataforma del suelo
     sf::RectangleShape plataformaSuelo;
@@ -113,8 +164,11 @@ int main() {
     cabanita.setPosition(distanciaMeta, alturaSuelo - 450.0f); // Posicionada sobre el suelo
     
     bool juegoGanado = false;
-    sf::Clock relojVictoria; // Reloj para esperar antes de mostrar interior
+    bool juegoPerdido = false;
+    sf::Clock relojVictoria; // Reloj para esperar 2 segundos antes de mostrar interior
     bool mostrarInterior = false;
+    float posicionPerdidaX = 0.0f;
+    float posicionPerdidaY = 0.0f;
     
     // Cargar la fuente para el mensaje de victoria
     sf::Font zombieFont;
@@ -139,8 +193,21 @@ int main() {
     textoVictoria.setFillColor(sf::Color::Red);
     textoVictoria.setPosition(150, 250);
     
+    // Crear sprite de Snoopy perdedor
+    sf::Sprite snoopyPerdedorSprite(snoopyPerdedorTexture);
+    // Escalar al mismo tamaño que Snoopy
+    snoopyPerdedorSprite.setScale(0.15f, 0.15f);
+    
+    // Crear texto de derrota
+    sf::Text textoDerrota;
+    textoDerrota.setFont(zombieFont);
+    textoDerrota.setString("te atraparon\nPresiona R para reiniciar");
+    textoDerrota.setCharacterSize(40);
+    textoDerrota.setFillColor(sf::Color::Red);
+    textoDerrota.setPosition(150, 220);
+    
     // Ajustar posición inicial de Snoopy para estar exactamente sobre el suelo
-    float alturaSprite = frameHeight * 0.2f; // 992 * 0.2 = 198.4
+    float alturaSprite = frameHeight * 0.2f; // Ajustado para Snoopy
     sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
 
     while (window.isOpen()) {
@@ -155,21 +222,23 @@ int main() {
         bool moviendoDerecha = false;
         bool moviendoIzquierda = false;
         
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            // Solo permitir retroceder si no está en la posición inicial
-            if (sprite.getPosition().x > posicionInicialX) {
-                sprite.move(-velocidad, 0);
-                moviendoIzquierda = true;
-                // El fondo NO retrocede, solo Snoopy se mueve
+        if (!juegoPerdido && !juegoGanado) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+                // Solo permitir retroceder si no está en la posición inicial
+                if (sprite.getPosition().x > posicionInicialX) {
+                    sprite.move(-velocidad, 0);
+                    moviendoIzquierda = true;
+                    // El fondo NO retrocede, solo Snoopy se mueve
+                }
             }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            sprite.move(velocidad, 0);
-            moviendoDerecha = true;
-            // Mover el fondo solo si no hemos llegado a la meta
-            if (distanciaRecorrida < distanciaMeta) {
-                fondoOffset -= velocidadFondo;
-                distanciaRecorrida += velocidadFondo; // Acumular distancia real
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+                sprite.move(velocidad, 0);
+                moviendoDerecha = true;
+                // Mover el fondo solo si no hemos llegado a la meta
+                if (distanciaRecorrida < distanciaMeta) {
+                    fondoOffset -= velocidadFondo;
+                    distanciaRecorrida += velocidadFondo; // Acumular distancia real
+                }
             }
         }
 
@@ -187,6 +256,46 @@ int main() {
         // Actualizar posición de la meta usando distancia real
         cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 450.0f);
         
+        // Actualizar posiciones de los zombies con el movimiento del fondo
+        for (int i = 0; i < 8; i++) {
+            float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida;
+            float alturaZombie = alturaUniformeZombies;
+            float posZombieY = alturaSuelo - alturaZombie - 50.0f;
+            zombieSprites[i].setPosition(posZombieX, posZombieY);
+        }
+        
+        // Verificar colisiones entre Snoopy y los zombies
+        if (!juegoGanado && !juegoPerdido) {
+            // Crear una zona de colisión más pequeña para Snoopy
+            sf::FloatRect originalBounds = sprite.getGlobalBounds();
+            float reduccion = 0.3f; // 30% de reducción en cada lado
+            sf::FloatRect snoopyBounds(
+                originalBounds.left + originalBounds.width * reduccion,
+                originalBounds.top + originalBounds.height * reduccion,
+                originalBounds.width * (1.0f - 2.0f * reduccion),
+                originalBounds.height * (1.0f - 2.0f * reduccion)
+            );
+            
+            for (int i = 0; i < 8; i++) {
+                // También reducir la zona de colisión de los zombies
+                sf::FloatRect originalZombieBounds = zombieSprites[i].getGlobalBounds();
+                sf::FloatRect zombieBounds(
+                    originalZombieBounds.left + originalZombieBounds.width * reduccion,
+                    originalZombieBounds.top + originalZombieBounds.height * reduccion,
+                    originalZombieBounds.width * (1.0f - 2.0f * reduccion),
+                    originalZombieBounds.height * (1.0f - 2.0f * reduccion)
+                );
+                
+                if (snoopyBounds.intersects(zombieBounds)) {
+                    juegoPerdido = true;
+                    posicionPerdidaX = sprite.getPosition().x;
+                    posicionPerdidaY = sprite.getPosition().y + 40.0f;
+                    snoopyPerdedorSprite.setPosition(posicionPerdidaX, posicionPerdidaY);
+                    break;
+                }
+            }
+        }
+        
         // Verificar colisión entre Snoopy y la cabañita
         float posXCabanita = distanciaMeta - distanciaRecorrida;
         float posXSnoopy = sprite.getPosition().x;
@@ -194,7 +303,7 @@ int main() {
         float anchoCabanita = 1024.0f * 0.5f; // 512 píxeles
         
         // Si Snoopy llega a la mitad de la cabañita, desaparecer y cambiar imagen
-        if (posXSnoopy + anchoSnoopy >= posXCabanita + (anchoCabanita / 2.0f) && !juegoGanado) {
+        if (posXSnoopy + anchoSnoopy >= posXCabanita + (anchoCabanita / 2.0f) && !juegoGanado && !juegoPerdido) {
             juegoGanado = true;
             cabanita.setTexture(cabanitaTexture); // Cambiar a cabana cerrada
             relojVictoria.restart(); // Iniciar contador para mostrar interior
@@ -204,22 +313,45 @@ int main() {
         if (juegoGanado && relojVictoria.getElapsedTime().asSeconds() >= 0.5f) {
             mostrarInterior = true;
         }
+        
+        // Reiniciar nivel si se presiona R cuando está perdido
+        if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+            // Resetear variables del juego
+            juegoPerdido = false;
+            juegoGanado = false;
+            mostrarInterior = false;
+            
+            // Resetear posición de Snoopy
+            sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
+            velocidadY = 0;
+            enElSuelo = true;
+            
+            // Resetear fondo y distancia
+            fondoOffset = 0.0f;
+            distanciaRecorrida = 0.0f;
+            
+            // Resetear animación
+            currentFrame = 0;
+            sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+        }
 
         // Salto con espacio
-        bool spacePressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
-        if (spacePressed && !spacePressedBefore && enElSuelo) {
-            velocidadY = fuerzaSalto;
-            enElSuelo = false;
+        if (!juegoPerdido) {
+            bool spacePressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+            if (spacePressed && !spacePressedBefore && enElSuelo) {
+                velocidadY = fuerzaSalto;
+                enElSuelo = false;
+            }
+            spacePressedBefore = spacePressed;
         }
-        spacePressedBefore = spacePressed;
 
         // Aplicar gravedad y movimiento vertical
         velocidadY += gravedad;
         sprite.move(0, velocidadY);
 
         // Verificar si está en el suelo
-        if (sprite.getPosition().y + frameHeight * 0.2f >= alturaSuelo) {
-            sprite.setPosition(sprite.getPosition().x, alturaSuelo - frameHeight * 0.2f);
+        if (sprite.getPosition().y + alturaSprite >= alturaSuelo) {
+            sprite.setPosition(sprite.getPosition().x, alturaSuelo - alturaSprite);
             velocidadY = 0;
             enElSuelo = true;
         }
@@ -258,12 +390,27 @@ int main() {
         // Dibujar meta
         window.draw(cabanita);
         
-        // Dibujar Snoopy solo si no ha ganado
-        if (!juegoGanado) {
+        // Dibujar zombies
+        for (int i = 0; i < 8; i++) {
+            // Solo dibujar zombies que estén dentro de la pantalla visible
+            float posX = zombieSprites[i].getPosition().x;
+            if (posX > -200 && posX < 1000) {
+                window.draw(zombieSprites[i]);
+            }
+        }
+        
+        // Dibujar Snoopy solo si no ha ganado ni perdido
+        if (!juegoGanado && !juegoPerdido) {
             window.draw(sprite);
         }
         
-        // Mostrar mensaje de victoria si ganó y han pasado 0.5 segundos
+        // Dibujar Snoopy perdedor si perdió
+        if (juegoPerdido) {
+            window.draw(snoopyPerdedorSprite);
+            window.draw(textoDerrota);
+        }
+        
+        // Mostrar mensaje de victoria si ganó y han pasado 2 segundos
         if (mostrarInterior) {
             window.draw(interiorSprite);
             window.draw(textoVictoria);
@@ -274,3 +421,4 @@ int main() {
 
     return 0;
 }
+

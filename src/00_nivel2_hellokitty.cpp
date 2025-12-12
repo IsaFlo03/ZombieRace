@@ -372,7 +372,7 @@ int main() {
                     juegoPerdido = true;
                     mostrarDerrota = true; // Mostrar inmediatamente
                     // Posicionar en la misma ubicación donde está Hello Kitty
-                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y);
+                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 15.0f);
                     break;
                 }
             }
@@ -388,7 +388,7 @@ int main() {
             if (helloKittyBounds.intersects(hordaBounds)) {
                 juegoPerdido = true;
                 mostrarDerrota = true;
-                derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 25.0f);
+                derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 40.0f);
             }
         }
         
