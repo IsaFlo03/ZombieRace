@@ -21,6 +21,10 @@ all: $(EXE_FILES)
 run%: $(BIN_DIR)/%.exe
 	./$<
 
+# Regla por defecto para ejecutar 00_1_nivel2_hellokitty
+run: $(BIN_DIR)/00_1_nivel2_hellokitty.exe
+	./$<
+
 # Regla para limpiar los archivos generados
 clean:
 	rm -f $(EXE_FILES)
