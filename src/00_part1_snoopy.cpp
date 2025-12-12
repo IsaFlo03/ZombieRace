@@ -35,7 +35,7 @@ int main() {
     
     // Cargar la imagen de interior para la victoria
     sf::Texture interiorTexture;
-    if (!interiorTexture.loadFromFile("assets/images/interior snoopy.png"))
+    if (!interiorTexture.loadFromFile("assets/images/interior.png"))
     {
         return -1;
     }
