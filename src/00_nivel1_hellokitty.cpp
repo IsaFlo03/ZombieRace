@@ -206,6 +206,14 @@ int main() {
     textoDerrota.setFillColor(sf::Color::Red);
     textoDerrota.setPosition(150, 220);
     
+    // Crear texto para volver al menu
+    sf::Text textoMenu;
+    textoMenu.setFont(zombieFont);
+    textoMenu.setString("presiona D para ir al menu");
+    textoMenu.setCharacterSize(25);
+    textoMenu.setFillColor(sf::Color::Black);
+    textoMenu.setPosition(520, 560);
+    
     // Ajustar posición inicial de Hello Kitty para estar exactamente sobre el suelo
     float alturaSprite = frameHeight * 0.3f; // 592 * 0.3 = 177.6
     sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
@@ -335,6 +343,12 @@ int main() {
             currentFrame = 0;
             sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
         }
+        
+        // Volver al menu si se presiona D cuando está perdido
+        if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            window.close();
+            system("bin\\00_Menu.exe");
+        }
 
         // Salto con espacio
         if (!juegoPerdido) {
@@ -410,6 +424,7 @@ int main() {
         if (juegoPerdido) {
             window.draw(hellokittyPerdedoraSprite);
             window.draw(textoDerrota);
+            window.draw(textoMenu);
         }
         
         // Mostrar mensaje de victoria si ganó y han pasado 2 segundos

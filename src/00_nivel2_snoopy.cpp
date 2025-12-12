@@ -222,10 +222,18 @@ int main() {
     // Crear texto de reinicio
     sf::Text textoReiniciar;
     textoReiniciar.setFont(zombieFont);
-    textoReiniciar.setString("Reiniciar");
+    textoReiniciar.setString("Presiona R para reiniciar");
     textoReiniciar.setCharacterSize(50);
     textoReiniciar.setFillColor(sf::Color::White);
-    textoReiniciar.setPosition(300, 350);
+    textoReiniciar.setPosition(100, 350);
+    
+    // Crear texto para volver al menu
+    sf::Text textoMenu;
+    textoMenu.setFont(zombieFont);
+    textoMenu.setString("presiona D para ir al menu");
+    textoMenu.setCharacterSize(25);
+    textoMenu.setFillColor(sf::Color::Black);
+    textoMenu.setPosition(520, 560);
     
     // Ajustar posición inicial de Snoopy para estar exactamente sobre el suelo
     float alturaSprite = frameHeight * 0.2f; // 992 * 0.2 = 198.4
@@ -238,29 +246,27 @@ int main() {
                 window.close();
             }
             
-            // Detectar clic para reiniciar cuando se pierde
-            if (event.type == sf::Event::MouseButtonPressed && juegoPerdido)
+            // Detectar tecla R para reiniciar cuando se pierde
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && juegoPerdido)
             {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    sf::FloatRect reiniciarBounds = textoReiniciar.getGlobalBounds();
-                    
-                    if (reiniciarBounds.contains(mousePos.x, mousePos.y))
-                    {
-                        // Reiniciar el juego
-                        juegoPerdido = false;
-                        mostrarDerrota = false;
-                        distanciaRecorrida = 0.0f;
-                        fondoOffset = 0.0f;
-                        sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
-                        velocidadY = 0;
-                        enElSuelo = true;
-                        hordaPosX = -200.0f; // Reiniciar posición de la horda
-                        hordaIniciada = false; // Reiniciar estado de la horda
-                        snoopySeMovio = false; // Reiniciar estado de movimiento
-                    }
-                }
+                // Reiniciar el juego
+                juegoPerdido = false;
+                mostrarDerrota = false;
+                distanciaRecorrida = 0.0f;
+                fondoOffset = 0.0f;
+                sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
+                velocidadY = 0;
+                enElSuelo = true;
+                hordaPosX = -200.0f; // Reiniciar posición de la horda
+                hordaIniciada = false; // Reiniciar estado de la horda
+                snoopySeMovio = false; // Reiniciar estado de movimiento
+            }
+            
+            // Detectar tecla D para volver al menu cuando se pierde
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D && juegoPerdido)
+            {
+                window.close();
+                system("bin\\00_Menu.exe");
             }
         }
 
@@ -490,6 +496,7 @@ int main() {
             window.draw(derrotaSprite);
             window.draw(textoDerrota);
             window.draw(textoReiniciar);
+            window.draw(textoMenu);
         }
         
         window.display();
