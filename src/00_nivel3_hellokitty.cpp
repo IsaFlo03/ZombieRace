@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
 double velocidad = 0.03;
 
@@ -119,25 +120,30 @@ int main() {
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
-    // Crear sprites de zombies con posiciones aleatorias
+    // Crear sprites de zombies con posiciones fijas
     sf::Sprite zombieSprites[8];
     float zombiePosicionesIniciales[8];
     float alturaUniformeZombies = 100.0f;
     
-    // Generar posiciones aleatorias para cada zombie entre 800 y 4500
+    // Posiciones fijas y bien distribuidas para cada zombie (alejadas mínimo 100px de la meta en 4800)
+    float posicionesFijas[8] = {
+        600.0f, 1050.0f, 1500.0f, 1950.0f,
+        2400.0f, 2850.0f, 3300.0f, 3750.0f
+    };
+    
     for (int i = 0; i < 8; i++) {
-        zombiePosicionesIniciales[i] = 800.0f + static_cast<float>(std::rand() % 3700); // Rango: 800 a 4500
+        zombiePosicionesIniciales[i] = posicionesFijas[i];
     }
     
     for (int i = 0; i < 8; i++) {
         zombieSprites[i].setTexture(zombieTextures[i]);
         
-        // Calcular escala para que todos tengan la misma altura
-        float alturaZombie = alturaUniformeZombies;
+        // Calcular escala - Zombiboy (índice 7) es más grande
+        float alturaZombie = (i == 7) ? 145.0f : alturaUniformeZombies; // Zombiboy más grande
         float escalaUniforme = alturaZombie / zombieTextures[i].getSize().y;
         zombieSprites[i].setScale(escalaUniforme, escalaUniforme);
         
-        // Usar posiciones aleatorias generadas
+        // Usar posiciones fijas
         float posicionY = alturaSuelo - alturaZombie - 50.0f;
         
         zombieSprites[i].setPosition(zombiePosicionesIniciales[i], posicionY);
@@ -162,6 +168,7 @@ int main() {
     bool juegoPerdido = false; // Nuevo: estado de derrota
     bool mostrarDerrota = false; // Nuevo: mostrar imagen de derrota
     sf::Clock relojDerrota; // Reloj para la pantalla de derrota
+    sf::Clock relojOscilacion; // Reloj para el movimiento de zombies
     
     // Cargar la fuente para el mensaje de victoria
     sf::Font zombieFont;
@@ -255,9 +262,9 @@ int main() {
                         fondoOffset = 0.0f;
                         velocidadY = 0;
                         enElSuelo = true;
-                        // Regenerar posiciones aleatorias de zombies
+                        // Mantener posiciones fijas de zombies (no regenerar)
                         for (int i = 0; i < 8; i++) {
-                            zombiePosicionesIniciales[i] = 800.0f + static_cast<float>(std::rand() % 3700);
+                            zombiePosicionesIniciales[i] = posicionesFijas[i];
                         }
                     }
                 }
@@ -275,11 +282,11 @@ int main() {
             }
         }
 
-        // Movimiento horizontal
+        // Movimiento horizontal (solo si no ha perdido)
         bool moviendoDerecha = false;
         bool moviendoIzquierda = false;
         
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+        if (!juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             // Solo permitir retroceder si no está en la posición inicial
             if (sprite.getPosition().x > posicionInicialX) {
                 sprite.move(-velocidad, 0);
@@ -287,7 +294,7 @@ int main() {
                 // El fondo NO retrocede, solo Hello Kitty se mueve
             }
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+        if (!juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             sprite.move(velocidad, 0);
             moviendoDerecha = true;
             // Mover el fondo solo si no hemos llegado a la meta
@@ -312,9 +319,12 @@ int main() {
         cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 400.0f);
         
         // Actualizar posiciones de los zombies con el movimiento del fondo
+        float tiempoOscilacion = relojOscilacion.getElapsedTime().asSeconds();
         for (int i = 0; i < 8; i++) {
-            float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida;
-            float alturaZombie = alturaUniformeZombies;
+            // Calcular oscilación de 15px hacia adelante y atrás
+            float desplazamientoOscilacion = std::sin(tiempoOscilacion * 2.0f + i * 0.5f) * 15.0f;
+            float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida + desplazamientoOscilacion;
+            float alturaZombie = (i == 7) ? 145.0f : alturaUniformeZombies; // Zombiboy más grande
             float posZombieY = alturaSuelo - alturaZombie - 50.0f;
             zombieSprites[i].setPosition(posZombieX, posZombieY);
         }
@@ -373,24 +383,26 @@ int main() {
             mostrarAmigos = true;
         }
 
-        // Salto con espacio
-        bool spacePressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+        // Salto con espacio (solo si no ha perdido)
+        bool spacePressed = !juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
         if (spacePressed && !spacePressedBefore && enElSuelo) {
             velocidadY = fuerzaSalto;
             enElSuelo = false;
         }
         spacePressedBefore = spacePressed;
 
-        // Aplicar gravedad y movimiento vertical
-        velocidadY += gravedad;
-        sprite.move(0, velocidadY);
+        // Aplicar gravedad y movimiento vertical (solo si no ha perdido)
+        if (!juegoPerdido) {
+            velocidadY += gravedad;
+            sprite.move(0, velocidadY);
 
-        // Verificar si está en el suelo
-        float alturaSprite = frameHeight * 0.3f;
-        if (sprite.getPosition().y + alturaSprite >= alturaSuelo) {
-            sprite.setPosition(sprite.getPosition().x, alturaSuelo - alturaSprite);
-            velocidadY = 0;
-            enElSuelo = true;
+            // Verificar si está en el suelo
+            float alturaSprite = frameHeight * 0.3f;
+            if (sprite.getPosition().y + alturaSprite >= alturaSuelo) {
+                sprite.setPosition(sprite.getPosition().x, alturaSuelo - alturaSprite);
+                velocidadY = 0;
+                enElSuelo = true;
+            }
         }
 
         // Límites de pantalla
@@ -401,8 +413,8 @@ int main() {
             sprite.setPosition(800 - frameWidth * 0.3f, sprite.getPosition().y);
         }
 
-        // Actualizar animación solo cuando se mueve
-        if (moviendoDerecha || moviendoIzquierda) {
+        // Actualizar animación solo cuando se mueve y no ha perdido
+        if (!juegoPerdido && (moviendoDerecha || moviendoIzquierda)) {
             if (clock.getElapsedTime().asSeconds() >= frameTime) {
                 currentFrame = (currentFrame + 1) % numFrames;
                 sprite.setTextureRect(sf::IntRect(currentFrame * frameWidth, 0, frameWidth, frameHeight));
