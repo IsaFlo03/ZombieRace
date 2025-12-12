@@ -4,38 +4,38 @@
 double velocidad = 0.03;
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy Adventure");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Hello Kitty - Nivel 2");
 
-    // Cargar los fondos
+    // Cargar los fondos del nivel 2
     sf::Texture fondoTexture1;
-    if (!fondoTexture1.loadFromFile("assets/images/Fond.png"))
+    if (!fondoTexture1.loadFromFile("assets/images/Fondo nivel 2.png"))
     {
         return -1;
     }
     
     sf::Texture fondoTexture2;
-    if (!fondoTexture2.loadFromFile("assets/images/fondo dos.png"))
+    if (!fondoTexture2.loadFromFile("assets/images/Fondo nivel 2.png"))
     {
         return -1;
     }
     
-    // Cargar la imagen de la cabaña abierta (inicial)
+    // Cargar la imagen de la casita cerrada (inicial)
     sf::Texture cabanaAbiertaTexture;
-    if (!cabanaAbiertaTexture.loadFromFile("assets/images/cabana abierta.png"))
+    if (!cabanaAbiertaTexture.loadFromFile("assets/images/casita cerrada.png"))
     {
         return -1;
     }
     
-    // Cargar la imagen de la cabañita cerrada (final)
+    // Cargar la imagen de la casita (final)
     sf::Texture cabanitaTexture;
-    if (!cabanitaTexture.loadFromFile("assets/images/cabanita.png"))
+    if (!cabanitaTexture.loadFromFile("assets/images/casita.png"))
     {
         return -1;
     }
     
     // Cargar la imagen de interior para la victoria
     sf::Texture interiorTexture;
-    if (!interiorTexture.loadFromFile("assets/images/interior snoopy.png"))
+    if (!interiorTexture.loadFromFile("assets/images/casita adentro.png"))
     {
         return -1;
     }
@@ -44,32 +44,25 @@ int main() {
     const int NUM_FONDOS = 16; // 8 de cada tipo
     sf::Sprite fondos[NUM_FONDOS];
     
-    // Escalar los fondos para que tengan exactamente el tamaño de la ventana (800x600)
+    // Usar escala proporcional manteniendo aspect ratio (no estirar la imagen)
     float escalaX1 = 800.0f / fondoTexture1.getSize().x;
     float escalaY1 = 600.0f / fondoTexture1.getSize().y;
-    float escalaX2 = 800.0f / fondoTexture2.getSize().x;
-    float escalaY2 = 600.0f / fondoTexture2.getSize().y;
+    // Usar la escala menor para mantener proporción y que se vea bien
+    float escala1 = (escalaX1 < escalaY1) ? escalaY1 : escalaY1;
     
-    // Obtener el ancho del fondo escalado (ahora será 800)
-    float fondoAncho = 800.0f;
+    // Obtener el ancho del fondo escalado
+    float fondoAncho = fondoTexture1.getSize().x * escala1;
     
-    // Configurar todos los fondos (intercalando fond.png y fondo dos.png)
+    // Configurar todos los fondos (todos usando Fondo nivel 2)
     for (int i = 0; i < NUM_FONDOS; i++) {
-        if (i % 2 == 0) {
-            // Pares: fond.png
-            fondos[i].setTexture(fondoTexture1);
-            fondos[i].setScale(escalaX1, escalaY1);
-        } else {
-            // Impares: fondo dos.png
-            fondos[i].setTexture(fondoTexture2);
-            fondos[i].setScale(escalaX2, escalaY2);
-        }
+        fondos[i].setTexture(fondoTexture1);
+        fondos[i].setScale(escala1, escala1);
         fondos[i].setPosition(i * fondoAncho, 0);
     }
 
-    // Cargar la imagen de Snoopy
+    // Cargar la imagen de Hello Kitty
     sf::Texture texture;
-    if (!texture.loadFromFile("assets/images/snoopy.png"))
+    if (!texture.loadFromFile("assets/images/hellokitty.png"))
     {
         return -1;
     }
@@ -77,40 +70,34 @@ int main() {
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
-    sprite.setScale(0.2f, 0.2f);
+    sprite.setScale(0.3f, 0.3f);
 
     sf::Clock clock;
     float frameTime = 0.1f;
     int currentFrame = 0;
     int numFrames = 4;
-    int frameWidth = 264;
-    int frameHeight = 992; // Altura completa de Snoopy (ambas filas)
+    int frameWidth = 216;
+    int frameHeight = 592;
 
     // Variables para el salto
     float velocidadY = 0;
     float gravedad = 0.01f;
     float fuerzaSalto = -1.5f;
-    float alturaSuelo = 560; // Altura donde está el suelo
+    float alturaSuelo = 630; // Altura donde está el suelo
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
     // Variable para el desplazamiento del fondo
     float fondoOffset = 0.0f;
-    float velocidadFondo = 0.25f; // Velocidad del fondo más lenta
+    float velocidadFondo = 0.5f; // Velocidad del fondo mantiene igual
     float distanciaRecorrida = 0.0f; // Distancia total recorrida sin ciclar
     
-    // Crear plataforma del suelo
-    sf::RectangleShape plataformaSuelo;
-    plataformaSuelo.setSize(sf::Vector2f(800, 40)); // Ancho completo, 40px de alto
-    plataformaSuelo.setPosition(0, alturaSuelo);
-    plataformaSuelo.setFillColor(sf::Color(101, 67, 33)); // Café oscuro
-    
     // Crear meta (cabañita de llegada)
-    float anchoCabanita = 1024.0f * 0.5f; // Ancho de la cabañita escalada (512)
+    float anchoCabanita = 1024.0f * 0.3f; // Ancho de la cabañita escalada (307.2)
     float distanciaMeta = 4800.0f - 800.0f + anchoCabanita; // Meta aparece completa en el borde derecho
     sf::Sprite cabanita(cabanaAbiertaTexture); // Iniciar con cabana abierta
-    cabanita.setScale(0.5f, 0.5f); // Escalar la cabañita (1024 * 0.5 = 512)
-    cabanita.setPosition(distanciaMeta, alturaSuelo - 450.0f); // Posicionada sobre el suelo
+    cabanita.setScale(0.3f, 0.3f); // Escalar la cabañita más pequeña
+    cabanita.setPosition(distanciaMeta, alturaSuelo - 307.2f); // Posicionada sobre el suelo
     
     bool juegoGanado = false;
     sf::Clock relojVictoria; // Reloj para esperar antes de mostrar interior
@@ -139,8 +126,8 @@ int main() {
     textoVictoria.setFillColor(sf::Color::Red);
     textoVictoria.setPosition(150, 250);
     
-    // Ajustar posición inicial de Snoopy para estar exactamente sobre el suelo
-    float alturaSprite = frameHeight * 0.2f; // 992 * 0.2 = 198.4
+    // Ajustar posición inicial de Hello Kitty para estar exactamente sobre el suelo
+    float alturaSprite = frameHeight * 0.3f; // 592 * 0.3 = 177.6
     sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
 
     while (window.isOpen()) {
@@ -160,7 +147,7 @@ int main() {
             if (sprite.getPosition().x > posicionInicialX) {
                 sprite.move(-velocidad, 0);
                 moviendoIzquierda = true;
-                // El fondo NO retrocede, solo Snoopy se mueve
+                // El fondo NO retrocede, solo Hello Kitty se mueve
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
@@ -185,16 +172,16 @@ int main() {
         }
         
         // Actualizar posición de la meta usando distancia real
-        cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 450.0f);
+        cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 307.2f);
         
-        // Verificar colisión entre Snoopy y la cabañita
+        // Verificar colisión entre Hello Kitty y la cabañita
         float posXCabanita = distanciaMeta - distanciaRecorrida;
-        float posXSnoopy = sprite.getPosition().x;
-        float anchoSnoopy = frameWidth * 0.2f;
-        float anchoCabanita = 1024.0f * 0.5f; // 512 píxeles
+        float posXHelloKitty = sprite.getPosition().x;
+        float anchoHelloKitty = frameWidth * 0.3f;
+        float anchoCabanita = 1024.0f * 0.3f; // 307.2 píxeles
         
-        // Si Snoopy llega a la mitad de la cabañita, desaparecer y cambiar imagen
-        if (posXSnoopy + anchoSnoopy >= posXCabanita + (anchoCabanita / 2.0f) && !juegoGanado) {
+        // Si Hello Kitty llega a la mitad de la cabañita, desaparecer y cambiar imagen
+        if (posXHelloKitty + anchoHelloKitty >= posXCabanita + (anchoCabanita / 2.0f) && !juegoGanado) {
             juegoGanado = true;
             cabanita.setTexture(cabanitaTexture); // Cambiar a cabana cerrada
             relojVictoria.restart(); // Iniciar contador para mostrar interior
@@ -218,8 +205,9 @@ int main() {
         sprite.move(0, velocidadY);
 
         // Verificar si está en el suelo
-        if (sprite.getPosition().y + frameHeight * 0.2f >= alturaSuelo) {
-            sprite.setPosition(sprite.getPosition().x, alturaSuelo - frameHeight * 0.2f);
+        float alturaSprite = frameHeight * 0.3f;
+        if (sprite.getPosition().y + alturaSprite >= alturaSuelo) {
+            sprite.setPosition(sprite.getPosition().x, alturaSuelo - alturaSprite);
             velocidadY = 0;
             enElSuelo = true;
         }
@@ -228,8 +216,8 @@ int main() {
         if (sprite.getPosition().x < 0) {
             sprite.setPosition(0, sprite.getPosition().y);
         }
-        if (sprite.getPosition().x > 800 - frameWidth * 0.2f) {
-            sprite.setPosition(800 - frameWidth * 0.2f, sprite.getPosition().y);
+        if (sprite.getPosition().x > 800 - frameWidth * 0.3f) {
+            sprite.setPosition(800 - frameWidth * 0.3f, sprite.getPosition().y);
         }
 
         // Actualizar animación solo cuando se mueve
@@ -252,13 +240,10 @@ int main() {
             window.draw(fondos[i]);
         }
         
-        // Dibujar plataforma del suelo
-        window.draw(plataformaSuelo);
-        
         // Dibujar meta
         window.draw(cabanita);
         
-        // Dibujar Snoopy solo si no ha ganado
+        // Dibujar Hello Kitty solo si no ha ganado
         if (!juegoGanado) {
             window.draw(sprite);
         }

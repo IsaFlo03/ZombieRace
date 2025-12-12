@@ -4,38 +4,38 @@
 double velocidad = 0.03;
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy Adventure");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy - Nivel 2");
 
-    // Cargar los fondos
+    // Cargar los fondos del nivel 2
     sf::Texture fondoTexture1;
-    if (!fondoTexture1.loadFromFile("assets/images/Fond.png"))
+    if (!fondoTexture1.loadFromFile("assets/images/Fondo nivel 2.png"))
     {
         return -1;
     }
     
     sf::Texture fondoTexture2;
-    if (!fondoTexture2.loadFromFile("assets/images/fondo dos.png"))
+    if (!fondoTexture2.loadFromFile("assets/images/Fondo nivel 2.png"))
     {
         return -1;
     }
     
-    // Cargar la imagen de la cabaña abierta (inicial)
+    // Cargar la imagen de la casita cerrada (inicial)
     sf::Texture cabanaAbiertaTexture;
-    if (!cabanaAbiertaTexture.loadFromFile("assets/images/cabana abierta.png"))
+    if (!cabanaAbiertaTexture.loadFromFile("assets/images/casita cerrada.png"))
     {
         return -1;
     }
     
-    // Cargar la imagen de la cabañita cerrada (final)
+    // Cargar la imagen de la casita (final)
     sf::Texture cabanitaTexture;
-    if (!cabanitaTexture.loadFromFile("assets/images/cabanita.png"))
+    if (!cabanitaTexture.loadFromFile("assets/images/casita.png"))
     {
         return -1;
     }
     
     // Cargar la imagen de interior para la victoria
     sf::Texture interiorTexture;
-    if (!interiorTexture.loadFromFile("assets/images/interior snoopy.png"))
+    if (!interiorTexture.loadFromFile("assets/images/casita snoopy.png"))
     {
         return -1;
     }
@@ -44,26 +44,19 @@ int main() {
     const int NUM_FONDOS = 16; // 8 de cada tipo
     sf::Sprite fondos[NUM_FONDOS];
     
-    // Escalar los fondos para que tengan exactamente el tamaño de la ventana (800x600)
+    // Usar escala proporcional manteniendo aspect ratio (no estirar la imagen)
     float escalaX1 = 800.0f / fondoTexture1.getSize().x;
     float escalaY1 = 600.0f / fondoTexture1.getSize().y;
-    float escalaX2 = 800.0f / fondoTexture2.getSize().x;
-    float escalaY2 = 600.0f / fondoTexture2.getSize().y;
+    // Usar la escala menor para mantener proporción y que se vea bien
+    float escala1 = (escalaX1 < escalaY1) ? escalaY1 : escalaY1;
     
-    // Obtener el ancho del fondo escalado (ahora será 800)
-    float fondoAncho = 800.0f;
+    // Obtener el ancho del fondo escalado
+    float fondoAncho = fondoTexture1.getSize().x * escala1;
     
-    // Configurar todos los fondos (intercalando fond.png y fondo dos.png)
+    // Configurar todos los fondos (todos usando Fondo nivel 2)
     for (int i = 0; i < NUM_FONDOS; i++) {
-        if (i % 2 == 0) {
-            // Pares: fond.png
-            fondos[i].setTexture(fondoTexture1);
-            fondos[i].setScale(escalaX1, escalaY1);
-        } else {
-            // Impares: fondo dos.png
-            fondos[i].setTexture(fondoTexture2);
-            fondos[i].setScale(escalaX2, escalaY2);
-        }
+        fondos[i].setTexture(fondoTexture1);
+        fondos[i].setScale(escala1, escala1);
         fondos[i].setPosition(i * fondoAncho, 0);
     }
 
@@ -84,13 +77,13 @@ int main() {
     int currentFrame = 0;
     int numFrames = 4;
     int frameWidth = 264;
-    int frameHeight = 992; // Altura completa de Snoopy (ambas filas)
+    int frameHeight = 992;
 
     // Variables para el salto
     float velocidadY = 0;
     float gravedad = 0.01f;
     float fuerzaSalto = -1.5f;
-    float alturaSuelo = 560; // Altura donde está el suelo
+    float alturaSuelo = 630; // Altura donde está el suelo
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
@@ -99,18 +92,12 @@ int main() {
     float velocidadFondo = 0.25f; // Velocidad del fondo más lenta
     float distanciaRecorrida = 0.0f; // Distancia total recorrida sin ciclar
     
-    // Crear plataforma del suelo
-    sf::RectangleShape plataformaSuelo;
-    plataformaSuelo.setSize(sf::Vector2f(800, 40)); // Ancho completo, 40px de alto
-    plataformaSuelo.setPosition(0, alturaSuelo);
-    plataformaSuelo.setFillColor(sf::Color(101, 67, 33)); // Café oscuro
-    
     // Crear meta (cabañita de llegada)
-    float anchoCabanita = 1024.0f * 0.5f; // Ancho de la cabañita escalada (512)
+    float anchoCabanita = 1024.0f * 0.3f; // Ancho de la cabañita escalada (307.2)
     float distanciaMeta = 4800.0f - 800.0f + anchoCabanita; // Meta aparece completa en el borde derecho
     sf::Sprite cabanita(cabanaAbiertaTexture); // Iniciar con cabana abierta
-    cabanita.setScale(0.5f, 0.5f); // Escalar la cabañita (1024 * 0.5 = 512)
-    cabanita.setPosition(distanciaMeta, alturaSuelo - 450.0f); // Posicionada sobre el suelo
+    cabanita.setScale(0.3f, 0.3f); // Escalar la cabañita más pequeña
+    cabanita.setPosition(distanciaMeta, alturaSuelo - 307.2f); // Posicionada sobre el suelo
     
     bool juegoGanado = false;
     sf::Clock relojVictoria; // Reloj para esperar antes de mostrar interior
@@ -185,13 +172,13 @@ int main() {
         }
         
         // Actualizar posición de la meta usando distancia real
-        cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 450.0f);
+        cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 307.2f);
         
         // Verificar colisión entre Snoopy y la cabañita
         float posXCabanita = distanciaMeta - distanciaRecorrida;
         float posXSnoopy = sprite.getPosition().x;
         float anchoSnoopy = frameWidth * 0.2f;
-        float anchoCabanita = 1024.0f * 0.5f; // 512 píxeles
+        float anchoCabanita = 1024.0f * 0.3f; // 307.2 píxeles
         
         // Si Snoopy llega a la mitad de la cabañita, desaparecer y cambiar imagen
         if (posXSnoopy + anchoSnoopy >= posXCabanita + (anchoCabanita / 2.0f) && !juegoGanado) {
@@ -251,9 +238,6 @@ int main() {
         for (int i = 0; i < NUM_FONDOS; i++) {
             window.draw(fondos[i]);
         }
-        
-        // Dibujar plataforma del suelo
-        window.draw(plataformaSuelo);
         
         // Dibujar meta
         window.draw(cabanita);
