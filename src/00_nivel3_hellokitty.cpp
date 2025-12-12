@@ -1,9 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 double velocidad = 0.03;
 
 int main() {
+    // Inicializar semilla aleatoria
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
+    
     sf::RenderWindow window(sf::VideoMode(800, 600), "Hello Kitty - Nivel 3");
 
     // Cargar los fondos del nivel 3
@@ -46,6 +51,13 @@ int main() {
     {
         return -1;
     }
+    
+    // Cargar la imagen de derrota
+    sf::Texture derrotaTexture;
+    if (!derrotaTexture.loadFromFile("assets/images/hellokitty perdedora.png"))
+    {
+        return -1;
+    }
 
     // Crear múltiples sprites del fondo para efecto parallax continuo
     const int NUM_FONDOS = 16; // 8 de cada tipo
@@ -74,6 +86,19 @@ int main() {
         return -1;
     }
 
+    // Cargar las texturas de los zombies
+    sf::Texture zombieTextures[8];
+    std::string zombieNames[8] = {
+        "Zombirron", "Zombiano", "Zombilia", "Zombando",
+        "Zombiguada", "Zombiscocho", "Zombiela", "Zombiboy"
+    };
+    
+    for (int i = 0; i < 8; i++) {
+        if (!zombieTextures[i].loadFromFile("assets/images/" + zombieNames[i] + ".png")) {
+            return -1;
+        }
+    }
+
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
@@ -94,6 +119,30 @@ int main() {
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
+    // Crear sprites de zombies con posiciones aleatorias
+    sf::Sprite zombieSprites[8];
+    float zombiePosicionesIniciales[8];
+    float alturaUniformeZombies = 100.0f;
+    
+    // Generar posiciones aleatorias para cada zombie entre 800 y 4500
+    for (int i = 0; i < 8; i++) {
+        zombiePosicionesIniciales[i] = 800.0f + static_cast<float>(std::rand() % 3700); // Rango: 800 a 4500
+    }
+    
+    for (int i = 0; i < 8; i++) {
+        zombieSprites[i].setTexture(zombieTextures[i]);
+        
+        // Calcular escala para que todos tengan la misma altura
+        float alturaZombie = alturaUniformeZombies;
+        float escalaUniforme = alturaZombie / zombieTextures[i].getSize().y;
+        zombieSprites[i].setScale(escalaUniforme, escalaUniforme);
+        
+        // Usar posiciones aleatorias generadas
+        float posicionY = alturaSuelo - alturaZombie - 50.0f;
+        
+        zombieSprites[i].setPosition(zombiePosicionesIniciales[i], posicionY);
+    }
+
     // Variable para el desplazamiento del fondo
     float fondoOffset = 0.0f;
     float velocidadFondo = 0.25f; // Velocidad del fondo más lenta
@@ -110,6 +159,9 @@ int main() {
     sf::Clock relojVictoria; // Reloj para esperar antes de mostrar interior
     bool mostrarInterior = false;
     bool mostrarAmigos = false; // Mostrar imagen de amigos después de 30 segundos
+    bool juegoPerdido = false; // Nuevo: estado de derrota
+    bool mostrarDerrota = false; // Nuevo: mostrar imagen de derrota
+    sf::Clock relojDerrota; // Reloj para la pantalla de derrota
     
     // Cargar la fuente para el mensaje de victoria
     sf::Font zombieFont;
@@ -158,6 +210,26 @@ int main() {
     textoVolverMenu.setFillColor(sf::Color::Black);
     textoVolverMenu.setPosition(480, 540);
     
+    // Crear sprite de derrota
+    sf::Sprite derrotaSprite(derrotaTexture);
+    derrotaSprite.setScale(0.08f, 0.08f); // Mismo tamaño pequeño que en nivel 2
+    
+    // Crear texto de derrota
+    sf::Text textoDerrota;
+    textoDerrota.setFont(zombieFont);
+    textoDerrota.setString("te atraparon los zombies");
+    textoDerrota.setCharacterSize(50);
+    textoDerrota.setFillColor(sf::Color::Red);
+    textoDerrota.setPosition(120, 250);
+    
+    // Crear texto de reinicio
+    sf::Text textoReiniciar;
+    textoReiniciar.setFont(zombieFont);
+    textoReiniciar.setString("Reiniciar");
+    textoReiniciar.setCharacterSize(50);
+    textoReiniciar.setFillColor(sf::Color::White);
+    textoReiniciar.setPosition(300, 350);
+    
     // Ajustar posición inicial de Hello Kitty para estar exactamente sobre el suelo
     float alturaSprite = frameHeight * 0.3f; // 592 * 0.3 = 177.6
     sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
@@ -167,6 +239,28 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+            }
+            
+            // Detectar clic en "Reiniciar" cuando se muestra la pantalla de derrota
+            if (mostrarDerrota && event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    sf::FloatRect boundsReiniciar = textoReiniciar.getGlobalBounds();
+                    if (boundsReiniciar.contains(mousePos.x, mousePos.y)) {
+                        // Reiniciar el juego
+                        juegoPerdido = false;
+                        mostrarDerrota = false;
+                        sprite.setPosition(posicionInicialX, alturaSuelo - (frameHeight * 0.2f));
+                        distanciaRecorrida = 0.0f;
+                        fondoOffset = 0.0f;
+                        velocidadY = 0;
+                        enElSuelo = true;
+                        // Regenerar posiciones aleatorias de zombies
+                        for (int i = 0; i < 8; i++) {
+                            zombiePosicionesIniciales[i] = 800.0f + static_cast<float>(std::rand() % 3700);
+                        }
+                    }
+                }
             }
             
             // Detectar clic en "volver al menu" cuando se muestra la pantalla de amigos
@@ -216,6 +310,45 @@ int main() {
         
         // Actualizar posición de la meta usando distancia real
         cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 400.0f);
+        
+        // Actualizar posiciones de los zombies con el movimiento del fondo
+        for (int i = 0; i < 8; i++) {
+            float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida;
+            float alturaZombie = alturaUniformeZombies;
+            float posZombieY = alturaSuelo - alturaZombie - 50.0f;
+            zombieSprites[i].setPosition(posZombieX, posZombieY);
+        }
+        
+        // Verificar colisiones entre Hello Kitty y los zombies
+        if (!juegoGanado && !juegoPerdido) {
+            // Crear una zona de colisión más pequeña para Hello Kitty
+            sf::FloatRect originalBounds = sprite.getGlobalBounds();
+            float reduccion = 0.3f; // 30% de reducción en cada lado
+            sf::FloatRect helloKittyBounds(
+                originalBounds.left + originalBounds.width * reduccion,
+                originalBounds.top + originalBounds.height * reduccion,
+                originalBounds.width * (1.0f - 2.0f * reduccion),
+                originalBounds.height * (1.0f - 2.0f * reduccion)
+            );
+            
+            for (int i = 0; i < 8; i++) {
+                // También reducir la zona de colisión de los zombies
+                sf::FloatRect originalZombieBounds = zombieSprites[i].getGlobalBounds();
+                sf::FloatRect zombieBounds(
+                    originalZombieBounds.left + originalZombieBounds.width * reduccion,
+                    originalZombieBounds.top + originalZombieBounds.height * reduccion,
+                    originalZombieBounds.width * (1.0f - 2.0f * reduccion),
+                    originalZombieBounds.height * (1.0f - 2.0f * reduccion)
+                );
+                
+                if (helloKittyBounds.intersects(zombieBounds)) {
+                    juegoPerdido = true;
+                    mostrarDerrota = true;
+                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y);
+                    break;
+                }
+            }
+        }
         
         // Verificar colisión entre Hello Kitty y la cabañita
         float posXCabanita = distanciaMeta - distanciaRecorrida;
@@ -291,9 +424,21 @@ int main() {
         // Dibujar meta
         window.draw(cabanita);
         
-        // Dibujar Hello Kitty solo si no ha ganado
-        if (!juegoGanado) {
+        // Dibujar zombies
+        for (int i = 0; i < 8; i++) {
+            window.draw(zombieSprites[i]);
+        }
+        
+        // Dibujar Hello Kitty solo si no ha ganado y no ha perdido
+        if (!juegoGanado && !juegoPerdido) {
             window.draw(sprite);
+        }
+        
+        // Mostrar pantalla de derrota si perdió
+        if (mostrarDerrota) {
+            window.draw(derrotaSprite);
+            window.draw(textoDerrota);
+            window.draw(textoReiniciar);
         }
         
         // Mostrar mensaje de victoria si ganó y han pasado 0.5 segundos
