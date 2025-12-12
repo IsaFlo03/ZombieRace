@@ -15,17 +15,26 @@ int main()
 
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
-    sprite.setPosition(300, 50);
     
-    // Escalar la imagen para que se vea más pequeña y quepa completa
-    sprite.setScale(0.3f, 0.3f);
+    // Dimensiones de cada frame - imagen hellokitty.png es 1280x612
+    int numFrames = 4; // Número total de frames en la animación (4 columnas)
+    int frameWidth = 320;  // Cada frame tiene 320 píxeles de ancho (1280/4)
+    int frameHeight = 612; // Altura de la imagen
+    
+    // Establecer el primer frame desde el inicio
+    sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+    
+    // Escalar para que se vea bien en la ventana
+    float scale = 0.2f;
+    sprite.setScale(scale, scale);
+    
+    // Centrar verticalmente
+    float scaledHeight = frameHeight * scale;
+    sprite.setPosition(300, (600 - scaledHeight) / 2);
 
     sf::Clock clock;
     float frameTime = 0.1f; // Tiempo entre cada frame en segundos
     int currentFrame = 0;
-    int numFrames = 4; // Número total de frames en la animación
-    int frameWidth = 216;  // Cada frame tiene 216 píxeles de ancho (864/4)
-    int frameHeight = 592; // Cada frame tiene 592 píxeles de alto (1184/2)
     float speed = 100.0f; // Velocidad de movimiento en píxeles por segundo
 
     sf::Clock movementClock; // Reloj para el movimiento
@@ -47,9 +56,10 @@ int main()
         sprite.move(speed * deltaTime, 0);
 
         // Si el sprite sale por la derecha, reiniciar a la izquierda
+        float scaledWidth = frameWidth * scale;
         if (sprite.getPosition().x > 800)
         {
-            sprite.setPosition(-frameWidth * 0.3f, sprite.getPosition().y);
+            sprite.setPosition(-scaledWidth, sprite.getPosition().y);
         }
 
         // Actualizar el frame de la animación

@@ -102,20 +102,20 @@ int main() {
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
-    sprite.setScale(0.3f, 0.3f);
+    sprite.setScale(0.2f, 0.2f); // Más pequeña
 
     sf::Clock clock;
     float frameTime = 0.1f;
     int currentFrame = 0;
     int numFrames = 4;
-    int frameWidth = 216;
-    int frameHeight = 592;
+    int frameWidth = 320;  // Dimensión correcta (1280/4)
+    int frameHeight = 612; // Dimensión correcta de hellokitty.png
 
     // Variables para el salto
     float velocidadY = 0;
     float gravedad = 0.01f;
     float fuerzaSalto = -1.5f;
-    float alturaSuelo = 630; // Altura donde está el suelo
+    float alturaSuelo = 635; // Altura donde está el suelo (bajada 5px)
     
     // Crear sprites de zombies con posiciones aleatorias
     sf::Sprite zombieSprites[8];
@@ -209,7 +209,7 @@ int main() {
     
     // Crear sprite de derrota
     sf::Sprite derrotaSprite(derrotaTexture);
-    derrotaSprite.setScale(0.5f, 0.5f);
+    derrotaSprite.setScale(0.08f, 0.08f); // Un poquito más pequeña
     
     // Crear texto de derrota
     sf::Text textoDerrota;
@@ -367,8 +367,8 @@ int main() {
                 if (helloKittyBounds.intersects(zombieBounds)) {
                     juegoPerdido = true;
                     mostrarDerrota = true; // Mostrar inmediatamente
-                    // Guardar la posición de Hello Kitty al momento de la colisión y bajarla 25 píxeles
-                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 25.0f);
+                    // Posicionar en la misma ubicación donde está Hello Kitty
+                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y);
                     break;
                 }
             }
@@ -388,7 +388,7 @@ int main() {
                 if (helloKittyBounds.intersects(hordaBounds)) {
                     juegoPerdido = true;
                     mostrarDerrota = true;
-                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 25.0f);
+                    derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y);
                 }
             }
         }

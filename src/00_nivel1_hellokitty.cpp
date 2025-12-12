@@ -77,20 +77,20 @@ int main() {
     // Crear un sprite y asignarle la textura
     sf::Sprite sprite(texture);
     float posicionInicialX = 100;
-    sprite.setScale(0.3f, 0.3f);
+    sprite.setScale(0.2f, 0.2f); // Más pequeña
 
     sf::Clock clock;
     float frameTime = 0.1f;
     int currentFrame = 0;
     int numFrames = 4;
-    int frameWidth = 216;
-    int frameHeight = 592;
+    int frameWidth = 320;  // Dimensión correcta (1280/4)
+    int frameHeight = 612; // Dimensión correcta de hellokitty.png
 
     // Variables para el salto
     float velocidadY = 0;
     float gravedad = 0.01f;
     float fuerzaSalto = -1.5f;
-    float alturaSuelo = 560; // Altura donde está el suelo
+    float alturaSuelo = 575; // Altura donde está el suelo (subida 4px más)
     bool enElSuelo = true;
     bool spacePressedBefore = false;
 
