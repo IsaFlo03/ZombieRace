@@ -52,6 +52,13 @@ int main() {
     {
         return -1;
     }
+    
+    // Cargar la imagen de la horda de zombies
+    sf::Texture hordaTexture;
+    if (!hordaTexture.loadFromFile("assets/images/Horda bien.png"))
+    {
+        return -1;
+    }
 
     // Crear múltiples sprites del fondo para efecto parallax continuo
     const int NUM_FONDOS = 16; // 8 de cada tipo
@@ -91,13 +98,6 @@ int main() {
         if (!zombieTextures[i].loadFromFile("assets/images/" + zombieNames[i] + ".png")) {
             return -1;
         }
-    }
-    
-    // Cargar la textura de la horda de zombies
-    sf::Texture hordaTexture;
-    if (!hordaTexture.loadFromFile("assets/images/Horda bien.png"))
-    {
-        return -1;
     }
     
     // Crear un sprite y asignarle la textura
@@ -148,21 +148,22 @@ int main() {
 
     // Variable para el desplazamiento del fondo
     float fondoOffset = 0.0f;
-    float velocidadFondo = 0.5f; // Velocidad del fondo mantiene igual
+    float velocidadFondo = 0.5f; // Velocidad del fondo
     float distanciaRecorrida = 0.0f; // Distancia total recorrida sin ciclar
     
     // Configurar la horda de zombies que persigue
-    sf::Sprite hordaSprite(hordaTexture);
-    int hordaFrameWidth = hordaTexture.getSize().x / 5; // 5 frames
+    int hordaNumFrames = 5;
+    int hordaFrameWidth = hordaTexture.getSize().x / hordaNumFrames;
     int hordaFrameHeight = hordaTexture.getSize().y;
+    int hordaCurrentFrame = 0;
     float hordaScale = 0.9f; // Escala más grande para la horda
-    hordaSprite.setScale(hordaScale, hordaScale);
+    
+    sf::Sprite hordaSprite(hordaTexture);
     hordaSprite.setTextureRect(sf::IntRect(0, 0, hordaFrameWidth, hordaFrameHeight));
+    hordaSprite.setScale(hordaScale, hordaScale);
     float hordaPosX = -200.0f; // Empieza fuera de la pantalla a la izquierda
     float hordaPosY = alturaSuelo - (hordaFrameHeight * hordaScale) + 255.0f; // Bajada 255 píxeles
     hordaSprite.setPosition(hordaPosX, hordaPosY);
-    int hordaCurrentFrame = 0;
-    int hordaNumFrames = 5;
     float hordaVelocidad = 0.06f; // Velocidad un poquito más lenta
     sf::Clock hordaClock; // Reloj independiente para la horda
     sf::Clock relojInicioHorda; // Reloj para controlar cuándo empieza la horda
