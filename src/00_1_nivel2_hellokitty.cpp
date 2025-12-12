@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
 double velocidad = 0.03;
 
@@ -80,16 +81,23 @@ int main() {
     }
 
     // Cargar las texturas de los zombies
-    sf::Texture zombieTextures[8];
-    std::string zombieNames[8] = {
+    sf::Texture zombieTextures[7];
+    std::string zombieNames[7] = {
         "Zombirron", "Zombiano", "Zombilia", "Zombando",
-        "Zombiguada", "Zombiscocho", "Zombiela", "Zombiboy"
+        "Zombiguada", "Zombiscocho", "Zombiela"
     };
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
         if (!zombieTextures[i].loadFromFile("assets/images/" + zombieNames[i] + ".png")) {
             return -1;
         }
+    }
+    
+    // Cargar la textura de la horda de zombies
+    sf::Texture hordaTexture;
+    if (!hordaTexture.loadFromFile("assets/images/Horda bien.png"))
+    {
+        return -1;
     }
     
     // Crear un sprite y asignarle la textura
@@ -111,27 +119,26 @@ int main() {
     float alturaSuelo = 630; // Altura donde está el suelo
     
     // Crear sprites de zombies con posiciones aleatorias
-    sf::Sprite zombieSprites[8];
-    float zombiePosicionesIniciales[8]; // Guardar posiciones iniciales absolutas
+    sf::Sprite zombieSprites[7];
+    float zombiePosicionesIniciales[7]; // Guardar posiciones iniciales absolutas
     float alturaUniformeZombies = 100.0f; // Altura uniforme para todos los zombies
     
     // Posiciones fijas y dispersas para cada zombie
-    float posicionesFijas[8] = {
+    float posicionesFijas[7] = {
         600.0f, 1200.0f, 1800.0f, 2400.0f,
-        3000.0f, 3600.0f, 4000.0f, 4400.0f
+        3000.0f, 3600.0f, 4000.0f
     };
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
         zombieSprites[i].setTexture(zombieTextures[i]);
         
         // Calcular escala para que todos tengan la misma altura
-        float alturaZombie = (i == 7) ? 150.0f : alturaUniformeZombies; // Zombiboy (índice 7) es más grande
-        float escalaUniforme = alturaZombie / zombieTextures[i].getSize().y;
+        float escalaUniforme = alturaUniformeZombies / zombieTextures[i].getSize().y;
         zombieSprites[i].setScale(escalaUniforme, escalaUniforme);
         
         // Usar posiciones fijas
         zombiePosicionesIniciales[i] = posicionesFijas[i];
-        float posicionY = alturaSuelo - alturaZombie - 50.0f;
+        float posicionY = alturaSuelo - alturaUniformeZombies - 50.0f;
         
         zombieSprites[i].setPosition(zombiePosicionesIniciales[i], posicionY);
     }
@@ -143,6 +150,24 @@ int main() {
     float fondoOffset = 0.0f;
     float velocidadFondo = 0.5f; // Velocidad del fondo mantiene igual
     float distanciaRecorrida = 0.0f; // Distancia total recorrida sin ciclar
+    
+    // Configurar la horda de zombies que persigue
+    sf::Sprite hordaSprite(hordaTexture);
+    int hordaFrameWidth = hordaTexture.getSize().x / 5; // 5 frames
+    int hordaFrameHeight = hordaTexture.getSize().y;
+    float hordaScale = 0.9f; // Escala más grande para la horda
+    hordaSprite.setScale(hordaScale, hordaScale);
+    hordaSprite.setTextureRect(sf::IntRect(0, 0, hordaFrameWidth, hordaFrameHeight));
+    float hordaPosX = -200.0f; // Empieza fuera de la pantalla a la izquierda
+    float hordaPosY = alturaSuelo - (hordaFrameHeight * hordaScale) + 255.0f; // Bajada 255 píxeles
+    hordaSprite.setPosition(hordaPosX, hordaPosY);
+    int hordaCurrentFrame = 0;
+    int hordaNumFrames = 5;
+    float hordaVelocidad = 0.06f; // Velocidad un poquito más lenta
+    sf::Clock hordaClock; // Reloj independiente para la horda
+    sf::Clock relojInicioHorda; // Reloj para controlar cuándo empieza la horda
+    bool hordaIniciada = false; // Si la horda ya debe moverse
+    bool helloKittySeMovio = false; // Si Hello Kitty ya se movió
     
     // Crear meta (cabañita de llegada)
     float anchoCabanita = 1024.0f * 0.3f; // Ancho de la cabañita escalada (307.2)
@@ -230,6 +255,9 @@ int main() {
                         sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
                         velocidadY = 0;
                         enElSuelo = true;
+                        hordaPosX = -200.0f; // Reiniciar posición de la horda
+                        hordaIniciada = false; // Reiniciar estado de la horda
+                        helloKittySeMovio = false; // Reiniciar estado de movimiento
                     }
                 }
             }
@@ -246,11 +274,23 @@ int main() {
                     sprite.move(-velocidad, 0);
                     moviendoIzquierda = true;
                     // El fondo NO retrocede, solo Hello Kitty se mueve
+                    
+                    // Iniciar el reloj cuando Hello Kitty se mueve por primera vez
+                    if (!helloKittySeMovio) {
+                        helloKittySeMovio = true;
+                        relojInicioHorda.restart();
+                    }
                 }
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                 sprite.move(velocidad, 0);
                 moviendoDerecha = true;
+                
+                // Iniciar el reloj cuando Hello Kitty se mueve por primera vez
+                if (!helloKittySeMovio) {
+                    helloKittySeMovio = true;
+                    relojInicioHorda.restart();
+                }
                 // Mover el fondo solo si no hemos llegado a la meta
                 if (distanciaRecorrida < distanciaMeta) {
                     fondoOffset -= velocidadFondo;
@@ -284,11 +324,24 @@ int main() {
         cabanita.setPosition(distanciaMeta - distanciaRecorrida, alturaSuelo - 307.2f);
         
         // Actualizar posiciones de los zombies con el movimiento del fondo
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 7; i++) {
             float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida;
-            float alturaZombie = (i == 7) ? 150.0f : alturaUniformeZombies; // Zombiboy (índice 7) es más grande
-            float posZombieY = alturaSuelo - alturaZombie - 50.0f;
+            float posZombieY = alturaSuelo - alturaUniformeZombies - 50.0f;
             zombieSprites[i].setPosition(posZombieX, posZombieY);
+        }
+        
+        // Actualizar posición de la horda que persigue a Hello Kitty
+        if (!juegoPerdido && !juegoGanado) {
+            // Verificar si han pasado 3 segundos desde que Hello Kitty se movió
+            if (helloKittySeMovio && !hordaIniciada && relojInicioHorda.getElapsedTime().asSeconds() >= 3.0f) {
+                hordaIniciada = true;
+            }
+            
+            // Solo mover la horda si ya debe estar activa
+            if (hordaIniciada) {
+                hordaPosX += hordaVelocidad;
+            }
+            hordaSprite.setPosition(hordaPosX, hordaPosY);
         }
         
         // Verificar colisiones entre Hello Kitty y los zombies
@@ -303,7 +356,7 @@ int main() {
                 originalBounds.height * (1.0f - 2.0f * reduccion)
             );
             
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 7; i++) {
                 // También reducir la zona de colisión de los zombies
                 sf::FloatRect originalZombieBounds = zombieSprites[i].getGlobalBounds();
                 sf::FloatRect zombieBounds(
@@ -320,6 +373,20 @@ int main() {
                     derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 25.0f);
                     break;
                 }
+            }
+            
+            // Verificar colisión con la horda
+            sf::FloatRect originalHordaBounds = hordaSprite.getGlobalBounds();
+            sf::FloatRect hordaBounds(
+                originalHordaBounds.left + originalHordaBounds.width * reduccion,
+                originalHordaBounds.top + originalHordaBounds.height * reduccion,
+                originalHordaBounds.width * (1.0f - 2.0f * reduccion),
+                originalHordaBounds.height * (1.0f - 2.0f * reduccion)
+            );
+            if (helloKittyBounds.intersects(hordaBounds)) {
+                juegoPerdido = true;
+                mostrarDerrota = true;
+                derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 25.0f);
             }
         }
         
@@ -372,6 +439,13 @@ int main() {
             // Mantener frame estático cuando no se mueve
             sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
         }
+        
+        // Animar la horda continuamente
+        if (hordaClock.getElapsedTime().asSeconds() >= frameTime) {
+            hordaCurrentFrame = (hordaCurrentFrame + 1) % hordaNumFrames;
+            hordaSprite.setTextureRect(sf::IntRect(hordaCurrentFrame * hordaFrameWidth, 0, hordaFrameWidth, hordaFrameHeight));
+            hordaClock.restart();
+        }
 
         // Dibujar
         window.clear();
@@ -385,12 +459,17 @@ int main() {
         window.draw(cabanita);
         
         // Dibujar zombies
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 7; i++) {
             // Solo dibujar zombies que estén dentro de la pantalla visible
             float posX = zombieSprites[i].getPosition().x;
             if (posX > -200 && posX < 1000) {
                 window.draw(zombieSprites[i]);
             }
+        }
+        
+        // Dibujar la horda perseguidora
+        if (!juegoPerdido && !juegoGanado) {
+            window.draw(hordaSprite);
         }
         
         // Dibujar Hello Kitty solo si no ha ganado ni perdido
