@@ -212,10 +212,10 @@ int main() {
     // Crear texto "volver al menu"
     sf::Text textoVolverMenu;
     textoVolverMenu.setFont(zombieFont);
-    textoVolverMenu.setString("volver al menu");
+    textoVolverMenu.setString("presiona m para ir al menu");
     textoVolverMenu.setCharacterSize(40);
     textoVolverMenu.setFillColor(sf::Color::Black);
-    textoVolverMenu.setPosition(480, 540);
+    textoVolverMenu.setPosition(380, 540);
     
     // Crear sprite de derrota
     sf::Sprite derrotaSprite(derrotaTexture);
@@ -232,10 +232,18 @@ int main() {
     // Crear texto de reinicio
     sf::Text textoReiniciar;
     textoReiniciar.setFont(zombieFont);
-    textoReiniciar.setString("Reiniciar");
+    textoReiniciar.setString("Presiona R para reiniciar");
     textoReiniciar.setCharacterSize(50);
     textoReiniciar.setFillColor(sf::Color::White);
-    textoReiniciar.setPosition(300, 350);
+    textoReiniciar.setPosition(100, 350);
+    
+    // Crear texto para volver al menu
+    sf::Text textoMenu;
+    textoMenu.setFont(zombieFont);
+    textoMenu.setString("presiona D para ir al menu");
+    textoMenu.setCharacterSize(25);
+    textoMenu.setFillColor(sf::Color::Black);
+    textoMenu.setPosition(520, 560);
     
     // Ajustar posición inicial de Snoopy para estar exactamente sobre el suelo
     float alturaSprite = frameHeight * 0.2f; // 992 * 0.2 = 198.4
@@ -248,37 +256,32 @@ int main() {
                 window.close();
             }
             
-            // Detectar clic en "Reiniciar" cuando se muestra la pantalla de derrota
-            if (mostrarDerrota && event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    sf::FloatRect boundsReiniciar = textoReiniciar.getGlobalBounds();
-                    if (boundsReiniciar.contains(mousePos.x, mousePos.y)) {
-                        // Reiniciar el juego
-                        juegoPerdido = false;
-                        mostrarDerrota = false;
-                        sprite.setPosition(posicionInicialX, alturaSuelo - (frameHeight * 0.2f));
-                        distanciaRecorrida = 0.0f;
-                        fondoOffset = 0.0f;
-                        velocidadY = 0;
-                        enElSuelo = true;
-                        // Mantener posiciones fijas de zombies (no regenerar)
-                        for (int i = 0; i < 8; i++) {
-                            zombiePosicionesIniciales[i] = posicionesFijas[i];
-                        }
-                    }
+            // Detectar tecla R para reiniciar cuando se muestra la pantalla de derrota
+            if (mostrarDerrota && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+                // Reiniciar el juego
+                juegoPerdido = false;
+                mostrarDerrota = false;
+                sprite.setPosition(posicionInicialX, alturaSuelo - (frameHeight * 0.2f));
+                distanciaRecorrida = 0.0f;
+                fondoOffset = 0.0f;
+                velocidadY = 0;
+                enElSuelo = true;
+                // Mantener posiciones fijas de zombies (no regenerar)
+                for (int i = 0; i < 8; i++) {
+                    zombiePosicionesIniciales[i] = posicionesFijas[i];
                 }
             }
             
-            // Detectar clic en "volver al menu" cuando se muestra la pantalla de amigos
-            if (mostrarAmigos && event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    sf::FloatRect boundsMenu = textoVolverMenu.getGlobalBounds();
-                    if (boundsMenu.contains(mousePos.x, mousePos.y)) {
-                        window.close(); // Cerrar el juego
-                    }
-                }
+            // Detectar tecla D para volver al menu cuando se muestra la pantalla de derrota
+            if (mostrarDerrota && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D) {
+                window.close();
+                system("bin\\00_Menu.exe");
+            }
+            
+            // Detectar tecla M para volver al menu cuando se muestra la pantalla de amigos
+            if (mostrarAmigos && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
+                window.close();
+                system("bin\\00_Menu.exe");
             }
         }
 
@@ -455,6 +458,7 @@ int main() {
         if (mostrarDerrota) {
             window.draw(textoDerrota);
             window.draw(textoReiniciar);
+            window.draw(textoMenu);
         }
         
         // Mostrar mensaje de victoria si ganó y han pasado 0.5 segundos
