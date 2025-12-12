@@ -76,7 +76,6 @@ Sobrevivir al apocalipsis zombie, atravesando un campo lleno de zombies hasta ll
 - **SFML Window**: Gestión de ventanas y eventos
 - **SFML System**: Funcionalidades del sistema (Clock, Vector2)
 - **SFML Audio**: Sistema de sonido y música
-- **Box2D**: Motor de física 2D (usado en ejemplos de física)
 
 ### Herramientas de Desarrollo
 - **Compilador**: g++ (GNU C++ Compiler)
