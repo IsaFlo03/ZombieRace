@@ -1,7 +1,8 @@
 
 
 @startuml
-' Diagrama de clases completo para ZombieRace
+
+' Diagrama de clases para ZombieRace
 
 class GameWindow {
   +GameWindow(width, height, title)
@@ -99,7 +100,6 @@ Imagen --> GameWindow : dibuja en
 Sprite --> sf::Sprite : contiene
 Sprite --> Imagen : usa
 Primitiva --> GameWindow : dibuja en
-TronPlayer --> Primitiva : usa
 HordaZombies --> Sprite : usa
 Zombiepedia --> Imagen : muestra
 Zombiepedia --> Texto : muestra

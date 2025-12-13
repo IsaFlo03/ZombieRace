@@ -419,7 +419,10 @@ int main()
                             personajeSeleccionado = "snoopy";
                             musicaIntro.stop();
                             window.close();
+                            // Ejecutar los 3 niveles de Snoopy sucesivamente
                             system("bin\\00_nivel1_snoopy.exe");
+                            system("bin\\00_nivel2_snoopy.exe");
+                            system("bin\\00_nivel3_snoopy.exe");
                             return 0;
                         }
                     }
