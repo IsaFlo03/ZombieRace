@@ -1,0 +1,153 @@
+@startuml
+' Diagrama de clases básico para ZombieRace
+
+class GameWindow {
+  +GameWindow(width, height, title)
+  +isOpen()
+  +close()
+  +clear()
+  +display()
+  +draw(shape)
+  +pollEvent(event)
+  +getSize()
+}
+
+class PhysicsSpace {
+  +PhysicsSpace()
+  +~PhysicsSpace()
+  +getSpace()
+}
+
+class Suelo {
+  +Suelo(space)
+  +~Suelo()
+}
+
+class Personaje {
+  +Personaje(position, color)
+  +move(offsetX, offsetY)
+  +draw(window)
+  +update()
+}
+
+' Relaciones
+Suelo --> PhysicsSpace : usa
+Personaje --> GameWindow : dibuja en
+GameWindow --> sf::RenderWindow : contiene
+PhysicsSpace --> cpSpace : contiene
+Suelo --> cpShape : contiene
+Personaje --> sf::Sprite : contiene
+Personaje --> sf::Texture : contiene
+
+@enduml
+@startuml
+' Diagrama de clases completo para ZombieRace
+
+class GameWindow {
+  +GameWindow(width, height, title)
+  +isOpen()
+  +close()
+  +clear()
+  +display()
+  +draw(shape)
+  +pollEvent(event)
+  +getSize()
+}
+
+class PhysicsSpace {
+  +PhysicsSpace()
+  +~PhysicsSpace()
+  +getSpace()
+}
+
+class Suelo {
+  +Suelo(space)
+  +~Suelo()
+}
+
+class Personaje {
+  +Personaje(position, color)
+  +move(offsetX, offsetY)
+  +draw(window)
+  +update()
+}
+
+class Menu {
+  +Menu()
+  +mostrar()
+  +seleccionarOpcion()
+}
+
+class Texto {
+  +Texto()
+  +setFont()
+  +setString()
+  +draw(window)
+}
+
+class Audio {
+  +Audio()
+  +play()
+  +stop()
+}
+
+class Imagen {
+  +Imagen()
+  +cargar()
+  +draw(window)
+}
+
+class Sprite {
+  +Sprite()
+  +setTexture()
+  +setPosition()
+  +draw(window)
+}
+
+class Primitiva {
+  +Primitiva()
+  +draw(window)
+}
+
+class TronPlayer {
+  +TronPlayer()
+  +Move()
+  +draw(window)
+}
+
+class HordaZombies {
+  +HordaZombies()
+  +draw(window)
+}
+
+class Zombiepedia {
+  +Zombiepedia()
+  +mostrar()
+}
+
+' Relaciones principales
+Suelo --> PhysicsSpace : usa
+Personaje --> GameWindow : dibuja en
+GameWindow --> "1" sf::RenderWindow : contiene
+PhysicsSpace --> "1" cpSpace : contiene
+Suelo --> "1" cpShape : contiene
+Personaje --> "1" sf::Sprite : contiene
+Personaje --> "1" sf::Texture : contiene
+Menu --> GameWindow : usa
+Menu --> Texto : muestra
+Menu --> Imagen : muestra
+Menu --> Audio : reproduce
+Texto --> sf::Font : usa
+Texto --> GameWindow : dibuja en
+Audio --> sf::Music : usa
+Imagen --> sf::Texture : usa
+Imagen --> GameWindow : dibuja en
+Sprite --> sf::Sprite : contiene
+Sprite --> Imagen : usa
+Primitiva --> GameWindow : dibuja en
+TronPlayer --> Primitiva : usa
+HordaZombies --> Sprite : usa
+Zombiepedia --> Imagen : muestra
+Zombiepedia --> Texto : muestra
+
+@enduml
