@@ -245,7 +245,6 @@ int main()
                         if (volverPortadaBounds.contains(mousePos))
                         {
                             window.close();
-                            system("bin\\00_Menu.exe");
                         }
                     }
                     else
