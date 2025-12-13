@@ -415,9 +415,21 @@ int main()
                             musicaIntro.stop();
                             window.close();
                             system("bin\\00_nivel1_hellokitty.exe");
+                            // Terminar el proceso principal después de ejecutar el nivel
                             return 0;
                         }
                         if (snoopyBounds.contains(mousePos.x, mousePos.y))
+                        {
+                            personajeSeleccionado = "snoopy";
+                            musicaIntro.stop();
+                            window.close();
+                            // Ejecutar los niveles de Snoopy, solo si el anterior terminó correctamente
+                            if (!run_level("bin\\00_nivel1_snoopy.exe")) return 0;
+                            if (!run_level("bin\\00_nivel2_snoopy.exe")) return 0;
+                            run_level("bin\\00_nivel3_snoopy.exe");
+                            // Terminar el proceso principal después de ejecutar los niveles
+                            return 0;
+                        }
                         {
                             personajeSeleccionado = "snoopy";
                             musicaIntro.stop();

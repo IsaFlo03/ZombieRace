@@ -242,6 +242,8 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 musicaJuego.stop();
                 window.close();
+                // Si se cierra la ventana, retornar 1 para indicar que no se completó el nivel
+                return 1;
             }
         }
 
