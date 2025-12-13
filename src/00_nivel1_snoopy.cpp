@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -10,6 +11,15 @@ int main() {
     std::srand(42);
     
     sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy Adventure");
+
+    // Cargar y reproducir música de juego
+    sf::Music musicaJuego;
+    if (!musicaJuego.openFromFile("./assets/music/juego.ogg"))
+    {
+        return -1;
+    }
+    musicaJuego.setLoop(true);
+    musicaJuego.play();
 
     // Cargar los fondos
     sf::Texture fondoTexture1;
@@ -222,6 +232,7 @@ int main() {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
+                musicaJuego.stop();
                 window.close();
             }
         }

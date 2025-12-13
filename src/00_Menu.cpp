@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <cstdlib>
 
 int main()
@@ -26,6 +27,15 @@ int main()
     {
         return -1;
     }
+    
+    // Cargar y reproducir música de intro
+    sf::Music musicaIntro;
+    if (!musicaIntro.openFromFile("./assets/music/Intro.ogg"))
+    {
+        return -1;
+    }
+    musicaIntro.setLoop(true);
+    musicaIntro.play();
 
     // Cargar imágenes de personajes
     sf::Texture helloKittyTexture;
@@ -399,6 +409,7 @@ int main()
                         if (hkBounds.contains(mousePos.x, mousePos.y))
                         {
                             personajeSeleccionado = "hellokitty";
+                            musicaIntro.stop();
                             window.close();
                             system("bin\\00_nivel1_hellokitty.exe");
                             return 0;
@@ -406,6 +417,7 @@ int main()
                         if (snoopyBounds.contains(mousePos.x, mousePos.y))
                         {
                             personajeSeleccionado = "snoopy";
+                            musicaIntro.stop();
                             window.close();
                             system("bin\\00_nivel1_snoopy.exe");
                             return 0;

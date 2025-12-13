@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -11,6 +12,15 @@ int main() {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     
     sf::RenderWindow window(sf::VideoMode(800, 600), "Snoopy - Nivel 3");
+
+    // Cargar y reproducir música de juego
+    sf::Music musicaJuego;
+    if (!musicaJuego.openFromFile("./assets/music/juego.ogg"))
+    {
+        return -1;
+    }
+    musicaJuego.setLoop(true);
+    musicaJuego.play();
 
     // Cargar los fondos del nivel 3
     sf::Texture fondoTexture1;
@@ -253,6 +263,7 @@ int main() {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
+                musicaJuego.stop();
                 window.close();
             }
             
@@ -274,12 +285,14 @@ int main() {
             
             // Detectar tecla D para volver al menu cuando se muestra la pantalla de derrota
             if (mostrarDerrota && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D) {
+                musicaJuego.stop();
                 window.close();
                 system("bin\\00_Menu.exe");
             }
             
             // Detectar tecla M para volver al menu cuando se muestra la pantalla de amigos
             if (mostrarAmigos && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
+                musicaJuego.stop();
                 window.close();
                 system("bin\\00_Menu.exe");
             }

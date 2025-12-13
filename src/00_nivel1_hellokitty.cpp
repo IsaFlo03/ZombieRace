@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -10,6 +11,15 @@ int main() {
     std::srand(42);
     
     sf::RenderWindow window(sf::VideoMode(800, 600), "Hello Kitty Adventure");
+
+    // Cargar y reproducir música de juego
+    sf::Music musicaJuego;
+    if (!musicaJuego.openFromFile("./assets/music/juego.ogg"))
+    {
+        return -1;
+    }
+    musicaJuego.setLoop(true);
+    musicaJuego.play();
 
     // Cargar los fondos
     sf::Texture fondoTexture1;
@@ -230,6 +240,7 @@ int main() {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
+                musicaJuego.stop();
                 window.close();
             }
         }
@@ -331,6 +342,7 @@ int main() {
         }
         // Si ya se mostró la pantalla de victoria por 2 segundos, pasar a nivel 2
         if (mostrarInterior && relojVictoria.getElapsedTime().asSeconds() >= 2.5f) {
+            musicaJuego.stop();
             window.close();
             system("bin\\00_nivel2_hellokitty.exe");
             return 0;
@@ -360,6 +372,7 @@ int main() {
         
         // Volver al menu si se presiona D cuando está perdido o ganado
         if ((juegoPerdido || juegoGanado) && sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            musicaJuego.stop();
             window.close();
             system("bin\\00_Menu.exe");
         }
