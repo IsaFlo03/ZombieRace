@@ -20,6 +20,14 @@ int main() {
     }
     musicaJuego.setLoop(true);
     musicaJuego.play();
+    
+    // Cargar música de derrota
+    sf::Music musicaGoblin;
+    if (!musicaGoblin.openFromFile("./assets/music/Goblin_00.ogg"))
+    {
+        return -1;
+    }
+    musicaGoblin.setLoop(true);
 
     // Cargar los fondos
     sf::Texture fondoTexture1;
@@ -307,6 +315,8 @@ int main() {
                 
                 if (snoopyBounds.intersects(zombieBounds)) {
                     juegoPerdido = true;
+                    musicaJuego.pause();
+                    musicaGoblin.play();
                     posicionPerdidaX = sprite.getPosition().x;
                     posicionPerdidaY = sprite.getPosition().y + 40.0f;
                     snoopyPerdedorSprite.setPosition(posicionPerdidaX, posicionPerdidaY);
@@ -348,6 +358,10 @@ int main() {
             juegoGanado = false;
             mostrarInterior = false;
             
+            // Controlar música
+            musicaGoblin.stop();
+            musicaJuego.play();
+            
             // Resetear posición de Snoopy
             sprite.setPosition(posicionInicialX, alturaSuelo - alturaSprite);
             velocidadY = 0;
@@ -364,6 +378,8 @@ int main() {
         
         // Volver al menu si se presiona D cuando está perdido
         if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            musicaGoblin.stop();
+            musicaJuego.stop();
             window.close();
             system("bin\\00_Menu.exe");
         }
