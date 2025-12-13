@@ -139,3 +139,4 @@ Ver archivo LICENSE para detalles
 - **Assets originales**: Creados por el equipo de desarrollo
 - **SFML**: Laurent Gomila y colaboradores
 - **Fuente Zombie Hunger**: Font utilizada para la temática zombie
+- **Imagenes de Snoopy y Hello Kitty**: Fanarts
