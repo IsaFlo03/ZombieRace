@@ -1,45 +1,5 @@
-@startuml
-' Diagrama de clases básico para ZombieRace
 
-class GameWindow {
-  +GameWindow(width, height, title)
-  +isOpen()
-  +close()
-  +clear()
-  +display()
-  +draw(shape)
-  +pollEvent(event)
-  +getSize()
-}
 
-class PhysicsSpace {
-  +PhysicsSpace()
-  +~PhysicsSpace()
-  +getSpace()
-}
-
-class Suelo {
-  +Suelo(space)
-  +~Suelo()
-}
-
-class Personaje {
-  +Personaje(position, color)
-  +move(offsetX, offsetY)
-  +draw(window)
-  +update()
-}
-
-' Relaciones
-Suelo --> PhysicsSpace : usa
-Personaje --> GameWindow : dibuja en
-GameWindow --> sf::RenderWindow : contiene
-PhysicsSpace --> cpSpace : contiene
-Suelo --> cpShape : contiene
-Personaje --> sf::Sprite : contiene
-Personaje --> sf::Texture : contiene
-
-@enduml
 @startuml
 ' Diagrama de clases completo para ZombieRace
 
@@ -106,12 +66,6 @@ class Sprite {
 
 class Primitiva {
   +Primitiva()
-  +draw(window)
-}
-
-class TronPlayer {
-  +TronPlayer()
-  +Move()
   +draw(window)
 }
 
