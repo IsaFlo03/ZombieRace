@@ -518,11 +518,13 @@ int main() {
         if (mostrarInterior) {
             window.draw(interiorSprite);
             window.draw(textoVictoria);
-            // Si ya se mostró la pantalla de victoria por 2 segundos, pasar a nivel 3
+            // Si ya se mostró la pantalla de victoria por 2 segundos, pasar a nivel 3 SOLO si la ventana sigue abierta
             if (relojVictoria.getElapsedTime().asSeconds() >= 2.5f) {
-                musicaJuego.stop();
-                window.close();
-                system("bin\\00_nivel3_snoopy.exe");
+                if (window.isOpen()) {
+                    musicaJuego.stop();
+                    window.close();
+                    system("bin\\00_nivel3_snoopy.exe");
+                }
                 return 0;
             }
         }

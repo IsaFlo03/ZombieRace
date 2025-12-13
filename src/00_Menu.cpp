@@ -423,9 +423,9 @@ int main()
                             musicaIntro.stop();
                             window.close();
                             // Ejecutar los niveles de Snoopy, solo si el anterior terminó correctamente
-                            if (run_level("bin/00_nivel1_snoopy.exe")) {
-                                if (run_level("bin/00_nivel2_snoopy.exe")) {
-                                    run_level("bin/00_nivel3_snoopy.exe");
+                            if (run_level("bin\\00_nivel1_snoopy.exe")) {
+                                if (run_level("bin\\00_nivel2_snoopy.exe")) {
+                                    run_level("bin\\00_nivel3_snoopy.exe");
                                 }
                             }
                             return 0;
