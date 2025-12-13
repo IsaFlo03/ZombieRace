@@ -21,6 +21,14 @@ int main() {
     }
     musicaJuego.setLoop(true);
     musicaJuego.play();
+    
+    // Cargar música de derrota
+    sf::Music musicaGoblin;
+    if (!musicaGoblin.openFromFile("./assets/music/Goblin_00.ogg"))
+    {
+        return -1;
+    }
+    musicaGoblin.setLoop(true);
 
     // Cargar los fondos del nivel 3
     sf::Texture fondoTexture1;
@@ -281,10 +289,15 @@ int main() {
                 for (int i = 0; i < 8; i++) {
                     zombiePosicionesIniciales[i] = posicionesFijas[i];
                 }
+                
+                // Controlar música
+                musicaGoblin.stop();
+                musicaJuego.play();
             }
             
             // Detectar tecla D para volver al menu cuando se muestra la pantalla de derrota
             if (mostrarDerrota && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D) {
+                musicaGoblin.stop();
                 musicaJuego.stop();
                 window.close();
                 system("bin\\00_Menu.exe");
@@ -369,6 +382,8 @@ int main() {
                 
                 if (helloKittyBounds.intersects(zombieBounds)) {
                     juegoPerdido = true;
+                    musicaJuego.pause();
+                    musicaGoblin.play();
                     mostrarDerrota = true;
                     derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y);
                     break;

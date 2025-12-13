@@ -20,6 +20,14 @@ int main() {
     }
     musicaJuego.setLoop(true);
     musicaJuego.play();
+    
+    // Cargar música de derrota
+    sf::Music musicaGoblin;
+    if (!musicaGoblin.openFromFile("./assets/music/Goblin_00.ogg"))
+    {
+        return -1;
+    }
+    musicaGoblin.setLoop(true);
 
     // Cargar los fondos del nivel 2
     sf::Texture fondoTexture1;
@@ -271,11 +279,17 @@ int main() {
                 hordaPosX = -200.0f; // Reiniciar posición de la horda
                 hordaIniciada = false; // Reiniciar estado de la horda
                 snoopySeMovio = false; // Reiniciar estado de movimiento
+                
+                // Controlar música
+                musicaGoblin.stop();
+                musicaJuego.play();
             }
             
             // Detectar tecla D para volver al menu cuando se pierde
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D && juegoPerdido)
             {
+                musicaGoblin.stop();
+                musicaJuego.stop();
                 window.close();
                 system("bin\\00_Menu.exe");
             }
@@ -387,6 +401,8 @@ int main() {
                 
                 if (snoopyBounds.intersects(zombieBounds)) {
                     juegoPerdido = true;
+                    musicaJuego.pause();
+                    musicaGoblin.play();
                     mostrarDerrota = true; // Mostrar inmediatamente
                     // Posicionar en la misma ubicación donde está Hello Kitty
                     derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 45.0f);
@@ -404,6 +420,8 @@ int main() {
             );
             if (snoopyBounds.intersects(hordaBounds)) {
                 juegoPerdido = true;
+                musicaJuego.pause();
+                musicaGoblin.play();
                 mostrarDerrota = true;
                 derrotaSprite.setPosition(sprite.getPosition().x, sprite.getPosition().y + 70.0f);
             }
