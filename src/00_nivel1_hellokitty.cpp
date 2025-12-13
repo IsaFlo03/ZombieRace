@@ -189,30 +189,38 @@ int main() {
     sf::Text textoVictoria;
     textoVictoria.setFont(zombieFont);
     textoVictoria.setString("estas a salvo esta vez");
-    textoVictoria.setCharacterSize(50);
+    textoVictoria.setCharacterSize(40);
     textoVictoria.setFillColor(sf::Color::Red);
-    textoVictoria.setPosition(150, 250);
+    textoVictoria.setPosition(150, 220);
     
     // Crear sprite de Hello Kitty perdedora
     sf::Sprite hellokittyPerdedoraSprite(hellokittyPerdedoraTexture);
-    // Escalar más pequeña que Hello Kitty
-    hellokittyPerdedoraSprite.setScale(0.09f, 0.09f);
+    // Escala un poco más grande
+    hellokittyPerdedoraSprite.setScale(0.1f, 0.1f);
     
     // Crear texto de derrota
     sf::Text textoDerrota;
     textoDerrota.setFont(zombieFont);
     textoDerrota.setString("te atraparon\nPresiona R para reiniciar");
-    textoDerrota.setCharacterSize(40);
-    textoDerrota.setFillColor(sf::Color::Red);
-    textoDerrota.setPosition(150, 220);
+    textoDerrota.setCharacterSize(50);
+    textoDerrota.setFillColor(sf::Color::White);
+    textoDerrota.setPosition(150, 200);
     
-    // Crear texto para volver al menu
+    // Crear texto para volver al menu (derrota)
     sf::Text textoMenu;
     textoMenu.setFont(zombieFont);
     textoMenu.setString("presiona D para ir al menu");
-    textoMenu.setCharacterSize(25);
-    textoMenu.setFillColor(sf::Color::Black);
-    textoMenu.setPosition(520, 560);
+    textoMenu.setCharacterSize(30);
+    textoMenu.setFillColor(sf::Color::White);
+    textoMenu.setPosition(180, 560);
+    
+    // Crear texto para volver al menu (victoria)
+    sf::Text textoMenuVictoria;
+    textoMenuVictoria.setFont(zombieFont);
+    textoMenuVictoria.setString("presiona D para ir al menu");
+    textoMenuVictoria.setCharacterSize(25);
+    textoMenuVictoria.setFillColor(sf::Color::Black);
+    textoMenuVictoria.setPosition(520, 560);
     
     // Ajustar posición inicial de Hello Kitty para estar exactamente sobre el suelo
     float alturaSprite = frameHeight * 0.3f; // 592 * 0.3 = 177.6
@@ -321,9 +329,15 @@ int main() {
         if (juegoGanado && relojVictoria.getElapsedTime().asSeconds() >= 0.5f) {
             mostrarInterior = true;
         }
+        // Si ya se mostró la pantalla de victoria por 2 segundos, pasar a nivel 2
+        if (mostrarInterior && relojVictoria.getElapsedTime().asSeconds() >= 2.5f) {
+            window.close();
+            system("bin\\00_nivel2_hellokitty.exe");
+            return 0;
+        }
         
-        // Reiniciar nivel si se presiona R cuando está perdido
-        if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+        // Reiniciar nivel si se presiona R cuando está perdido o ganado
+        if ((juegoPerdido || juegoGanado) && sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
             // Resetear variables del juego
             juegoPerdido = false;
             juegoGanado = false;
@@ -344,8 +358,8 @@ int main() {
             sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
         }
         
-        // Volver al menu si se presiona D cuando está perdido
-        if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        // Volver al menu si se presiona D cuando está perdido o ganado
+        if ((juegoPerdido || juegoGanado) && sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             window.close();
             system("bin\\00_Menu.exe");
         }
@@ -394,43 +408,34 @@ int main() {
 
         // Dibujar
         window.clear();
-        
-        // Dibujar todos los fondos para efecto continuo
-        for (int i = 0; i < NUM_FONDOS; i++) {
-            window.draw(fondos[i]);
-        }
-        
-        // Dibujar plataforma del suelo
-        window.draw(plataformaSuelo);
-        
-        // Dibujar meta
-        window.draw(cabanita);
-        
-        // Dibujar zombies
-        for (int i = 0; i < 8; i++) {
-            // Solo dibujar zombies que estén dentro de la pantalla visible
-            float posX = zombieSprites[i].getPosition().x;
-            if (posX > -200 && posX < 1000) {
-                window.draw(zombieSprites[i]);
-            }
-        }
-        
-        // Dibujar Hello Kitty solo si no ha ganado ni perdido
-        if (!juegoGanado && !juegoPerdido) {
-            window.draw(sprite);
-        }
-        
-        // Dibujar Hello Kitty perdedora si perdió
         if (juegoPerdido) {
+            // Pantalla de derrota
+            for (int i = 0; i < NUM_FONDOS; i++) {
+                window.draw(fondos[i]);
+            }
+            window.draw(plataformaSuelo);
             window.draw(hellokittyPerdedoraSprite);
             window.draw(textoDerrota);
             window.draw(textoMenu);
-        }
-        
-        // Mostrar mensaje de victoria si ganó y han pasado 2 segundos
-        if (mostrarInterior) {
+        } else if (mostrarInterior) {
+            // Pantalla de victoria
             window.draw(interiorSprite);
             window.draw(textoVictoria);
+            // NO dibujar textoMenu ni textoMenuVictoria
+        } else {
+            // Juego normal
+            for (int i = 0; i < NUM_FONDOS; i++) {
+                window.draw(fondos[i]);
+            }
+            window.draw(plataformaSuelo);
+            window.draw(cabanita);
+            for (int i = 0; i < 8; i++) {
+                float posX = zombieSprites[i].getPosition().x;
+                if (posX > -200 && posX < 1000) {
+                    window.draw(zombieSprites[i]);
+                }
+            }
+            window.draw(sprite);
         }
         
         window.display();

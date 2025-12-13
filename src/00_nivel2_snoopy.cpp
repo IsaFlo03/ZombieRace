@@ -489,6 +489,12 @@ int main() {
         if (mostrarInterior) {
             window.draw(interiorSprite);
             window.draw(textoVictoria);
+            // Si ya se mostró la pantalla de victoria por 2 segundos, pasar a nivel 3
+            if (relojVictoria.getElapsedTime().asSeconds() >= 2.5f) {
+                window.close();
+                system("bin\\00_nivel3_snoopy.exe");
+                return 0;
+            }
         }
         
         // Mostrar mensaje de derrota si perdió y han pasado 0.5 segundos

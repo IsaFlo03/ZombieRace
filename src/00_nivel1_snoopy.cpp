@@ -321,6 +321,14 @@ int main() {
         if (juegoGanado && relojVictoria.getElapsedTime().asSeconds() >= 0.5f) {
             mostrarInterior = true;
         }
+        // Si ya se mostró la pantalla de victoria por 2 segundos, pasar a nivel 2
+        if (mostrarInterior && relojVictoria.getElapsedTime().asSeconds() >= 2.5f) {
+            // Nivel 2 eliminado: ya no se avanza a otro nivel
+            window.close();
+            // Aquí podrías regresar al menú si lo deseas:
+            // system("bin\\00_Menu.exe");
+            return 0;
+        }
         
         // Reiniciar nivel si se presiona R cuando está perdido
         if (juegoPerdido && sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {

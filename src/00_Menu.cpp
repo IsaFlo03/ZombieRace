@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <cstdlib>
 
 int main()
 {
@@ -176,12 +177,13 @@ int main()
     tituloSeleccion.setPosition(400, 60);
 
     // Configurar sprite de Hello Kitty (mitad izquierda, centrado)
-    float hkScale = 1.1f;
-    helloKittySprite.setTextureRect(sf::IntRect(0, 0, 216, 592)); // Primer frame
-    helloKittySprite.setScale(hkScale, hkScale);
-    float hkScaledWidth = 216 * hkScale;
-    float hkScaledHeight = 592 * hkScale;
-    helloKittySprite.setPosition((200 - hkScaledWidth/2), 350 - hkScaledHeight/2);
+    float hkScaleX = 0.75f;
+    float hkScaleY = 0.75f;
+    helloKittySprite.setTextureRect(sf::IntRect(0, 0, 320, 612)); // Primer frame de hellokitty.png
+    helloKittySprite.setScale(hkScaleX, hkScaleY);
+    float hkScaledWidth = 320 * hkScaleX;
+    float hkScaledHeight = 612 * hkScaleY;
+    helloKittySprite.setPosition((200 - hkScaledWidth/2), 340 - hkScaledHeight/2);
 
     // Cargar segunda parte de Snoopy
     sf::Sprite snoopySprite2(snoopyTexture);
@@ -194,11 +196,11 @@ int main()
     
     snoopySprite.setTextureRect(sf::IntRect(0, 0, 264, 496)); // Primer frame parte superior
     snoopySprite.setScale(snoopyScale, snoopyScale);
-    snoopySprite.setPosition(snoopyPosX, 300 - snoopyTotalHeight/2);
+    snoopySprite.setPosition(snoopyPosX, 370 - snoopyTotalHeight/2);
     
     snoopySprite2.setTextureRect(sf::IntRect(0, 496, 264, 496)); // Parte inferior
     snoopySprite2.setScale(snoopyScale, snoopyScale);
-    snoopySprite2.setPosition(snoopyPosX, 300 - snoopyTotalHeight/2 + 496 * snoopyScale);
+    snoopySprite2.setPosition(snoopyPosX, 370 - snoopyTotalHeight/2 + 496 * snoopyScale);
 
     sf::Text opcionHelloKitty;
     opcionHelloKitty.setFont(font);
@@ -397,14 +399,16 @@ int main()
                         if (hkBounds.contains(mousePos.x, mousePos.y))
                         {
                             personajeSeleccionado = "hellokitty";
-                            juegoIniciado = true;
-                            seleccionPersonaje = false;
+                            window.close();
+                            system("bin\\00_nivel1_hellokitty.exe");
+                            return 0;
                         }
                         if (snoopyBounds.contains(mousePos.x, mousePos.y))
                         {
                             personajeSeleccionado = "snoopy";
-                            juegoIniciado = true;
-                            seleccionPersonaje = false;
+                            window.close();
+                            system("bin\\00_nivel1_snoopy.exe");
+                            return 0;
                         }
                     }
                 }
