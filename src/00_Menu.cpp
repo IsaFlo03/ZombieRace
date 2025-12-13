@@ -1,3 +1,4 @@
+#include "../include/SnoopyLevelUtils.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <cstdlib>
@@ -324,7 +325,8 @@ int main()
                                 }
                                 else
                                 {
-                                    // Volver al menú principal
+                                    // Abrir Zombiepedia externa y regresar al menú principal
+                                    system("bin\\12_Zombiepedia.exe");
                                     zombiepediaAbierta = false;
                                     zpEnPortada = true;
                                     zpPaginaActual = 1;
@@ -394,6 +396,7 @@ int main()
                         }
                         if (zombiepediaBounds.contains(mousePos.x, mousePos.y))
                         {
+                            // Abrir Zombiepedia y, al cerrarse, volver al menú principal
                             system("bin\\12_Zombiepedia.exe");
                         }
                     }
@@ -419,10 +422,12 @@ int main()
                             personajeSeleccionado = "snoopy";
                             musicaIntro.stop();
                             window.close();
-                            // Ejecutar los 3 niveles de Snoopy sucesivamente
-                            system("bin\\00_nivel1_snoopy.exe");
-                            system("bin\\00_nivel2_snoopy.exe");
-                            system("bin\\00_nivel3_snoopy.exe");
+                            // Ejecutar los niveles de Snoopy, solo si el anterior terminó correctamente
+                            if (run_level("bin/00_nivel1_snoopy.exe")) {
+                                if (run_level("bin/00_nivel2_snoopy.exe")) {
+                                    run_level("bin/00_nivel3_snoopy.exe");
+                                }
+                            }
                             return 0;
                         }
                     }
