@@ -384,7 +384,7 @@ int main()
                         }
                         if (zombiepediaBounds.contains(mousePos.x, mousePos.y))
                         {
-                            zombiepediaAbierta = true;
+                            system("bin\\12_Zombiepedia.exe");
                         }
                     }
                     else if (seleccionPersonaje)

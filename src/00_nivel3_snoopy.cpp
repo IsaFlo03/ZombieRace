@@ -139,7 +139,7 @@ int main() {
         zombieSprites[i].setTexture(zombieTextures[i]);
         
         // Calcular escala - Zombiboy (índice 7) es más grande
-        float alturaZombie = (i == 7) ? 145.0f : alturaUniformeZombies; // Zombiboy más grande
+        float alturaZombie = (i == 7) ? 115.0f : alturaUniformeZombies; // Zombiboy más grande
         float escalaUniforme = alturaZombie / zombieTextures[i].getSize().y;
         zombieSprites[i].setScale(escalaUniforme, escalaUniforme);
         
@@ -327,7 +327,7 @@ int main() {
             // Calcular oscilación de 15px hacia adelante y atrás
             float desplazamientoOscilacion = std::sin(tiempoOscilacion * 2.0f + i * 0.5f) * 15.0f;
             float posZombieX = zombiePosicionesIniciales[i] - distanciaRecorrida + desplazamientoOscilacion;
-            float alturaZombie = (i == 7) ? 145.0f : alturaUniformeZombies; // Zombiboy más grande
+            float alturaZombie = (i == 7) ? 115.0f : alturaUniformeZombies; // Zombiboy más grande
             float posZombieY = alturaSuelo - alturaZombie - 45.0f;
             zombieSprites[i].setPosition(posZombieX, posZombieY);
         }

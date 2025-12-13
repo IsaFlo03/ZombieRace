@@ -43,11 +43,12 @@ int main()
     }
     sf::Sprite pagina1Sprite(pagina1Texture);
     
-    // Escalar página 1 manteniendo proporción
+    // Escalar página 1 manteniendo proporción y añadir márgenes
     sf::Vector2u p1Size = pagina1Texture.getSize();
-    float scale1 = std::min((float)windowSize.x / p1Size.x, (float)windowSize.y / p1Size.y);
+    float margen = 20.0f; // Margen de 20 píxeles
+    float scale1 = std::min((float)(windowSize.x - 2 * margen) / p1Size.x, (float)(windowSize.y - 2 * margen) / p1Size.y);
     pagina1Sprite.setScale(scale1, scale1);
-    // Centrar
+    // Centrar con márgenes
     pagina1Sprite.setPosition((windowSize.x - p1Size.x * scale1) / 2, (windowSize.y - p1Size.y * scale1) / 2);
 
     sf::Texture pagina2Texture;
@@ -57,9 +58,9 @@ int main()
     }
     sf::Sprite pagina2Sprite(pagina2Texture);
     
-    // Escalar página 2 manteniendo proporción
+    // Escalar página 2 manteniendo proporción y añadir márgenes
     sf::Vector2u p2Size = pagina2Texture.getSize();
-    float scale2 = std::min((float)windowSize.x / p2Size.x, (float)windowSize.y / p2Size.y);
+    float scale2 = std::min((float)(windowSize.x - 2 * margen) / p2Size.x, (float)(windowSize.y - 2 * margen) / p2Size.y);
     pagina2Sprite.setScale(scale2, scale2);
     pagina2Sprite.setPosition((windowSize.x - p2Size.x * scale2) / 2, (windowSize.y - p2Size.y * scale2) / 2);
 
@@ -69,25 +70,25 @@ int main()
     
     if (!pagina3Texture.loadFromFile("./assets/images/Pagina 3.png")) return -1;
     pagina3Sprite.setTexture(pagina3Texture);
-    float scale3 = std::min((float)windowSize.x / pagina3Texture.getSize().x, (float)windowSize.y / pagina3Texture.getSize().y);
+    float scale3 = std::min((float)(windowSize.x - 2 * margen) / pagina3Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina3Texture.getSize().y);
     pagina3Sprite.setScale(scale3, scale3);
     pagina3Sprite.setPosition((windowSize.x - pagina3Texture.getSize().x * scale3) / 2, (windowSize.y - pagina3Texture.getSize().y * scale3) / 2);
     
     if (!pagina4Texture.loadFromFile("./assets/images/Pagina 4.png")) return -1;
     pagina4Sprite.setTexture(pagina4Texture);
-    float scale4 = std::min((float)windowSize.x / pagina4Texture.getSize().x, (float)windowSize.y / pagina4Texture.getSize().y);
+    float scale4 = std::min((float)(windowSize.x - 2 * margen) / pagina4Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina4Texture.getSize().y);
     pagina4Sprite.setScale(scale4, scale4);
     pagina4Sprite.setPosition((windowSize.x - pagina4Texture.getSize().x * scale4) / 2, (windowSize.y - pagina4Texture.getSize().y * scale4) / 2);
     
     if (!pagina5Texture.loadFromFile("./assets/images/Pagina 5.png")) return -1;
     pagina5Sprite.setTexture(pagina5Texture);
-    float scale5 = std::min((float)windowSize.x / pagina5Texture.getSize().x, (float)windowSize.y / pagina5Texture.getSize().y);
+    float scale5 = std::min((float)(windowSize.x - 2 * margen) / pagina5Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina5Texture.getSize().y);
     pagina5Sprite.setScale(scale5, scale5);
     pagina5Sprite.setPosition((windowSize.x - pagina5Texture.getSize().x * scale5) / 2, (windowSize.y - pagina5Texture.getSize().y * scale5) / 2);
     
     if (!pagina6Texture.loadFromFile("./assets/images/Pagina 6.png")) return -1;
     pagina6Sprite.setTexture(pagina6Texture);
-    float scale6 = std::min((float)windowSize.x / pagina6Texture.getSize().x, (float)windowSize.y / pagina6Texture.getSize().y);
+    float scale6 = std::min((float)(windowSize.x - 2 * margen) / pagina6Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina6Texture.getSize().y);
     pagina6Sprite.setScale(scale6, scale6);
     pagina6Sprite.setPosition((windowSize.x - pagina6Texture.getSize().x * scale6) / 2, (windowSize.y - pagina6Texture.getSize().y * scale6) / 2);
 
@@ -97,25 +98,25 @@ int main()
     
     if (!pagina7Texture.loadFromFile("./assets/images/Pagina 7.png")) return -1;
     pagina7Sprite.setTexture(pagina7Texture);
-    float scale7 = std::min((float)windowSize.x / pagina7Texture.getSize().x, (float)windowSize.y / pagina7Texture.getSize().y);
+    float scale7 = std::min((float)(windowSize.x - 2 * margen) / pagina7Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina7Texture.getSize().y);
     pagina7Sprite.setScale(scale7, scale7);
     pagina7Sprite.setPosition((windowSize.x - pagina7Texture.getSize().x * scale7) / 2, (windowSize.y - pagina7Texture.getSize().y * scale7) / 2);
     
     if (!pagina8Texture.loadFromFile("./assets/images/Pagina 8.png")) return -1;
     pagina8Sprite.setTexture(pagina8Texture);
-    float scale8 = std::min((float)windowSize.x / pagina8Texture.getSize().x, (float)windowSize.y / pagina8Texture.getSize().y);
+    float scale8 = std::min((float)(windowSize.x - 2 * margen) / pagina8Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina8Texture.getSize().y);
     pagina8Sprite.setScale(scale8, scale8);
     pagina8Sprite.setPosition((windowSize.x - pagina8Texture.getSize().x * scale8) / 2, (windowSize.y - pagina8Texture.getSize().y * scale8) / 2);
     
     if (!pagina9Texture.loadFromFile("./assets/images/Pagina 9.png")) return -1;
     pagina9Sprite.setTexture(pagina9Texture);
-    float scale9 = std::min((float)windowSize.x / pagina9Texture.getSize().x, (float)windowSize.y / pagina9Texture.getSize().y);
+    float scale9 = std::min((float)(windowSize.x - 2 * margen) / pagina9Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina9Texture.getSize().y);
     pagina9Sprite.setScale(scale9, scale9);
     pagina9Sprite.setPosition((windowSize.x - pagina9Texture.getSize().x * scale9) / 2, (windowSize.y - pagina9Texture.getSize().y * scale9) / 2);
     
     if (!pagina10Texture.loadFromFile("./assets/images/Pagina 10.png")) return -1;
     pagina10Sprite.setTexture(pagina10Texture);
-    float scale10 = std::min((float)windowSize.x / pagina10Texture.getSize().x, (float)windowSize.y / pagina10Texture.getSize().y);
+    float scale10 = std::min((float)(windowSize.x - 2 * margen) / pagina10Texture.getSize().x, (float)(windowSize.y - 2 * margen) / pagina10Texture.getSize().y);
     pagina10Sprite.setScale(scale10, scale10);
     pagina10Sprite.setPosition((windowSize.x - pagina10Texture.getSize().x * scale10) / 2, (windowSize.y - pagina10Texture.getSize().y * scale10) / 2);
 
@@ -126,20 +127,13 @@ int main()
         return -1;
     }
 
-    // Texto para botones de navegación (posiciones relativas a ventana)
-    sf::Text botonSiguiente;
-    botonSiguiente.setFont(font);
-    botonSiguiente.setString(">");
-    botonSiguiente.setCharacterSize(60);
-    botonSiguiente.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
-    botonSiguiente.setPosition(windowSize.x - 80, windowSize.y - 100);
-
-    sf::Text botonAnterior;
-    botonAnterior.setFont(font);
-    botonAnterior.setString("<");
-    botonAnterior.setCharacterSize(60);
-    botonAnterior.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
-    botonAnterior.setPosition(50, windowSize.y - 100);
+    // Texto para instrucciones de navegación
+    sf::Text textoNavegacion;
+    textoNavegacion.setFont(font);
+    textoNavegacion.setString("usa las flechitas para viajar entre paginas");
+    textoNavegacion.setCharacterSize(30);
+    textoNavegacion.setFillColor(sf::Color::Black);
+    textoNavegacion.setPosition(windowSize.x / 2 - 250, windowSize.y - 50);
 
     sf::Text botonVolver;
     botonVolver.setFont(font);
@@ -147,6 +141,22 @@ int main()
     botonVolver.setCharacterSize(40);
     botonVolver.setFillColor(sf::Color(0x65, 0x09, 0x09));
     botonVolver.setPosition(20, 20);
+    
+    // Texto "presiona A" en la portada
+    sf::Text textoPresionaA;
+    textoPresionaA.setFont(font);
+    textoPresionaA.setString("presiona A");
+    textoPresionaA.setCharacterSize(50);
+    textoPresionaA.setFillColor(sf::Color::Black);
+    textoPresionaA.setPosition(windowSize.x / 2 - 100, windowSize.y - 80);
+    
+    // Botón "volver" en la portada
+    sf::Text botonVolverPortada;
+    botonVolverPortada.setFont(font);
+    botonVolverPortada.setString("volver");
+    botonVolverPortada.setCharacterSize(35);
+    botonVolverPortada.setFillColor(sf::Color(0x65, 0x09, 0x09));
+    botonVolverPortada.setPosition(20, 20);
 
     // Estados
     bool enPortada = true;
@@ -173,10 +183,6 @@ int main()
         // Actualizar tamaño de ventana y posiciones
         sf::Vector2u currentWindowSize = window.getSize();
         
-        // Actualizar posiciones de botones
-        botonSiguiente.setPosition(currentWindowSize.x - 80, currentWindowSize.y - 100);
-        botonAnterior.setPosition(50, currentWindowSize.y - 100);
-        
         // Actualizar cuadrantes
         float mitadAncho = currentWindowSize.x / 2.0f;
         float mitadAlto = currentWindowSize.y / 2.0f;
@@ -196,6 +202,34 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            
+            // Detectar tecla A para abrir la Zombiepedia desde la portada
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A && enPortada)
+            {
+                enPortada = false;
+                paginaActual = 1;
+            }
+            
+            // Navegación con flechas del teclado
+            if (event.type == sf::Event::KeyPressed && !enPortada)
+            {
+                if (event.key.code == sf::Keyboard::Right)
+                {
+                    // Flecha derecha: siguiente página
+                    if (paginaActual == 1)
+                    {
+                        paginaActual = 2;
+                    }
+                }
+                else if (event.key.code == sf::Keyboard::Left)
+                {
+                    // Flecha izquierda: página anterior
+                    if (paginaActual == 2)
+                    {
+                        paginaActual = 1;
+                    }
+                }
+            }
 
             if (event.type == sf::Event::MouseButtonPressed)
             {
@@ -203,14 +237,15 @@ int main()
                 {
                     sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 
-                    // Si estamos en la portada, al hacer clic en la imagen vamos a página 1
+                    // Si estamos en la portada
                     if (enPortada)
                     {
-                        sf::FloatRect zombiepediaBounds = zombiepediaSprite.getGlobalBounds();
-                        if (zombiepediaBounds.contains(mousePos))
+                        // Detectar clic en botón volver de la portada
+                        sf::FloatRect volverPortadaBounds = botonVolverPortada.getGlobalBounds();
+                        if (volverPortadaBounds.contains(mousePos))
                         {
-                            enPortada = false;
-                            paginaActual = 1;
+                            window.close();
+                            system("bin\\00_Menu.exe");
                         }
                     }
                     else
@@ -239,14 +274,8 @@ int main()
                             // En página 1
                             if (paginaActual == 1)
                             {
-                                // Botón siguiente (verificar primero)
-                                sf::FloatRect siguienteBounds = botonSiguiente.getGlobalBounds();
-                                if (siguienteBounds.contains(mousePos))
-                                {
-                                    paginaActual = 2;
-                                }
                                 // Detectar clics en cuadrantes
-                                else if (cuadranteSuperiorIzq.contains(mousePos))
+                                if (cuadranteSuperiorIzq.contains(mousePos))
                                 {
                                     paginaActual = 3;
                                 }
@@ -266,14 +295,8 @@ int main()
                             // En página 2
                             else if (paginaActual == 2)
                             {
-                                // Botón anterior (verificar primero)
-                                sf::FloatRect anteriorBounds = botonAnterior.getGlobalBounds();
-                                if (anteriorBounds.contains(mousePos))
-                                {
-                                    paginaActual = 1;
-                                }
                                 // Detectar clics en cuadrantes
-                                else if (cuadranteSuperiorIzqP2.contains(mousePos))
+                                if (cuadranteSuperiorIzqP2.contains(mousePos))
                                 {
                                     paginaActual = 7;
                                 }
@@ -299,8 +322,20 @@ int main()
             if (event.type == sf::Event::MouseMoved && enPortada)
             {
                 sf::Vector2f mousePos(event.mouseMove.x, event.mouseMove.y);
-                sf::FloatRect zombiepediaBounds = zombiepediaSprite.getGlobalBounds();
                 
+                // Hover en botón volver de la portada
+                sf::FloatRect volverPortadaBounds = botonVolverPortada.getGlobalBounds();
+                if (volverPortadaBounds.contains(mousePos))
+                {
+                    botonVolverPortada.setFillColor(sf::Color::Red);
+                }
+                else
+                {
+                    botonVolverPortada.setFillColor(sf::Color(0x65, 0x09, 0x09));
+                }
+                
+                // Hover en imagen de Zombiepedia
+                sf::FloatRect zombiepediaBounds = zombiepediaSprite.getGlobalBounds();
                 if (zombiepediaBounds.contains(mousePos))
                 {
                     float newScale = zombiepediaScale * 1.05f;
@@ -312,33 +347,11 @@ int main()
                 }
             }
 
-            // Efectos hover en botones de página
+            // Efectos hover en botón volver
             if (event.type == sf::Event::MouseMoved && !enPortada)
             {
                 sf::Vector2f mousePos(event.mouseMove.x, event.mouseMove.y);
                 
-                // Hover botón siguiente
-                sf::FloatRect siguienteBounds = botonSiguiente.getGlobalBounds();
-                if (siguienteBounds.contains(mousePos))
-                {
-                    botonSiguiente.setFillColor(sf::Color::Yellow);
-                }
-                else
-                {
-                    botonSiguiente.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
-                }
-
-                // Hover botón anterior
-                sf::FloatRect anteriorBounds = botonAnterior.getGlobalBounds();
-                if (anteriorBounds.contains(mousePos))
-                {
-                    botonAnterior.setFillColor(sf::Color::Yellow);
-                }
-                else
-                {
-                    botonAnterior.setFillColor(sf::Color(0xd7, 0xcc, 0x3a));
-                }
-
                 // Hover botón volver
                 sf::FloatRect volverBounds = botonVolver.getGlobalBounds();
                 if (volverBounds.contains(mousePos))
@@ -361,6 +374,8 @@ int main()
         {
             // Mostrar imagen de portada
             window.draw(zombiepediaSprite);
+            window.draw(textoPresionaA);
+            window.draw(botonVolverPortada);
         }
         else
         {
@@ -368,12 +383,12 @@ int main()
             if (paginaActual == 1)
             {
                 window.draw(pagina1Sprite);
-                window.draw(botonSiguiente);
+                window.draw(textoNavegacion);
             }
             else if (paginaActual == 2)
             {
                 window.draw(pagina2Sprite);
-                window.draw(botonAnterior);
+                window.draw(textoNavegacion);
             }
             else if (paginaActual == 3)
             {
